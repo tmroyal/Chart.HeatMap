@@ -37,7 +37,9 @@
 		barDatasetSpacing : 1,
 
 		//String - A legend template
-		legendTemplate : "<ul class=\"<%=name.toLowerCase()%>-legend\"><% for (var i=0; i<datasets.length; i++){%><li><span style=\"background-color:<%=datasets[i].fillColor%>\"></span><%if(datasets[i].label){%><%=datasets[i].label%><%}%></li><%}%></ul>"
+		legendTemplate : "<ul class=\"<%=name.toLowerCase()%>-legend\"><% for (var i=0; i<datasets.length; i++){%><li><span style=\"background-color:<%=datasets[i].fillColor%>\"></span><%if(datasets[i].label){%><%=datasets[i].label%><%}%></li><%}%></ul>",
+
+    tooltipTemplate: "<%= xLabel %> | <%= yLabel %> : <%= value %>"
 
 	};
 
@@ -203,8 +205,8 @@
 						datasetLabel: dataset.label,
 						strokeColor : dataset.strokeColor,
 						fillColor : 'hsla(100,'+dataPoint*10+'%,50%, 0.7)',//dataset.fillColor,
-						highlightFill : dataset.highlightFill || dataset.fillColor,
-						highlightStroke : dataset.highlightStroke || dataset.strokeColor
+						highlightFill : 'hsla(200,'+dataPoint*10+'%,50%, 0.7)',//dataset.fillColor,
+						highlightStroke : 'transparent' //dataset.highlightStroke || dataset.strokeColor
 					}));
 				},this);
 
@@ -244,23 +246,18 @@
 			},this);
 		},
 		getBarsAtEvent : function(e){
-			var barsArray = [],
-				eventPosition = helpers.getRelativePosition(e),
-				datasetIterator = function(dataset){
-					barsArray.push(dataset.bars[barIndex]);
-				},
-				barIndex;
+      var eventPosition = helpers.getRelativePosition(e),
+        barIndex;
 
 			for (var datasetIndex = 0; datasetIndex < this.datasets.length; datasetIndex++) {
 				for (barIndex = 0; barIndex < this.datasets[datasetIndex].bars.length; barIndex++) {
 					if (this.datasets[datasetIndex].bars[barIndex].inRange(eventPosition.x,eventPosition.y)){
-						helpers.each(this.datasets, datasetIterator);
-						return barsArray;
+						return [this.datasets[datasetIndex].bars[barIndex]];
 					}
 				}
 			}
 
-			return barsArray;
+			return [];
 		},
 		buildScale : function(labels, yLabels){
 			var self = this;
@@ -360,6 +357,35 @@
 			});
 			this.scale.update(newScaleProps);
 		},
+    showTooltip : function(ChartElements){
+      this.draw();
+      helpers.each(ChartElements, function(Element) {
+        var tooltipPosition = Element.tooltipPosition();
+        var tooltipVariables = {
+          xLabel: Element.datasetLabel,
+          yLabel: Element.label,
+          value: Element.value
+        };
+
+        new Chart.Tooltip({
+          x: Math.round(tooltipPosition.x),
+          y: Math.round(tooltipPosition.y+20),
+          xPadding: this.options.tooltipXPadding,
+          yPadding: this.options.tooltipYPadding,
+          fillColor: this.options.tooltipFillColor,
+          textColor: this.options.tooltipFontColor,
+          fontFamily: this.options.tooltipFontFamily,
+          fontStyle: this.options.tooltipFontStyle,
+          fontSize: this.options.tooltipFontSize,
+          caretHeight: this.options.tooltipCaretSize,
+          cornerRadius: this.options.tooltipCornerRadius,
+          text: helpers.template(this.options.tooltipTemplate, tooltipVariables),
+          chart: this.chart,
+          custom: this.options.customTooltips
+        }).draw();
+      }, this);
+      return this;
+    },
 		draw : function(ease){
 			var easingDecimal = ease || 1;
 			this.clear();
