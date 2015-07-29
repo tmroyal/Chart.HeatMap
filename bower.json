@@ -1,0 +1,26 @@
+{
+  "name": "Chart.HeatMap",
+  "version": "0.0.1-alpha",
+  "homepage": "https://github.com/tmroyal/Chart.HeatMap",
+  "authors": [
+    "tmroyal <thomas.m.royal@gmail.com>"
+  ],
+  "description": "Heatmap extension for Chart.js",
+  "main": "dst/Chart.HeatMap.S.js",
+  "keywords": [
+    "chart.js",
+    "heat",
+    "map"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "Chart.js": "~1.0.2"
+  }
+}

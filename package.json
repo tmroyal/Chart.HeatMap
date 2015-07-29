@@ -1,0 +1,35 @@
+{
+  "name": "chart.heatmap.js",
+  "version": "0.0.1-alpha",
+  "description": "A heat map extension for chart.js",
+  "main": "dst/Chart.HeatMap.S.js",
+  "devDependencies": {
+    "chart.js": "^1.0.2",
+    "jshint": "latest",
+    "uglify-js": "^1.3.5"
+  },
+  "scripts": {
+    "test": "echo \"No tests specified \n\" && exit 0",
+    "lint": "jshint Chart.HeatMap.js",
+    "concat:plugin": "cat csscolorparser.js Chart.HeatMap.js > dst/Chart.HeatMap.js",
+    "concat:standalone": "cat ./node_modules/chart.js/src/Chart.Core.js csscolorparser.js Chart.HeatMap.js > dst/Chart.HeatMap.S.js",
+    "build:plugin": "npm run concat:plugin && uglifyjs dst/Chart.HeatMap.js > dst/Chart.HeatMap.min.js",
+    "build:standalone": "npm run concat:standalone && uglifyjs dst/Chart.HeatMap.S.js > dst/Chart.HeatMap.S.min.js",
+    "build": "npm run build:plugin & npm run build:standalone",
+    "clean": "rm -r dst/*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tmroyal/Chart.HeatMap.git"
+  },
+  "keywords": [
+    "chart.js",
+    "heat map"
+  ],
+  "author": "Thomas Royal",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tmroyal/Chart.HeatMap/issues"
+  },
+  "homepage": "https://github.com/tmroyal/Chart.HeatMap"
+}
