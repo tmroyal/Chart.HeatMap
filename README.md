@@ -1,2 +1,2 @@
 # Chart.HeatMap
-A heat map plugin for chart.js
+A heat map plugin for chart.js (coming soon)
