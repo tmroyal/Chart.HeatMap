@@ -84,7 +84,7 @@
             ctx.fillStyle = this.textColor;
             ctx.font = this.font;
             helpers.each(this.yLabels,function(labelString,index){
-              var yLabelCenter = this.endPoint - (yLabelGap * index),
+              var yLabelCenter = this.endPoint - (yLabelGap * index) - yLabelGap*0.5,
                 linePositionY = Math.round(yLabelCenter),
                 drawHorizontalLine = this.showHorizontalLines;
 
@@ -94,41 +94,6 @@
                 ctx.fillText(labelString,xStart - 10,yLabelCenter);
               }
 
-              // This is X axis, so draw it
-              if (index === 0 && !drawHorizontalLine){
-                drawHorizontalLine = true;
-              }
-
-              if (drawHorizontalLine){
-                ctx.beginPath();
-              }
-
-              if (index > 0){
-                // This is a grid line in the centre, so drop that
-                ctx.lineWidth = this.gridLineWidth;
-                ctx.strokeStyle = this.gridLineColor;
-              } else {
-                // This is the first line on the scale
-                ctx.lineWidth = this.lineWidth;
-                ctx.strokeStyle = this.lineColor;
-              }
-
-              linePositionY += helpers.aliasPixel(ctx.lineWidth);
-
-              if(drawHorizontalLine){
-                ctx.moveTo(xStart, linePositionY);
-                ctx.lineTo(this.width, linePositionY);
-                ctx.stroke();
-                ctx.closePath();
-              }
-
-              ctx.lineWidth = this.lineWidth;
-              ctx.strokeStyle = this.lineColor;
-              ctx.beginPath();
-              ctx.moveTo(xStart - 5, linePositionY);
-              ctx.lineTo(xStart, linePositionY);
-              ctx.stroke();
-              ctx.closePath();
 
             },this);
 
@@ -139,43 +104,8 @@
                 isRotated = (this.xLabelRotation > 0),
                 drawVerticalLine = this.showVerticalLines;
 
-              // This is Y axis, so draw it
-              if (index === 0 && !drawVerticalLine){
-                drawVerticalLine = true;
-              }
-
-              if (drawVerticalLine){
-                ctx.beginPath();
-              }
-
-              if (index > 0){
-                // This is a grid line in the centre, so drop that
-                ctx.lineWidth = this.gridLineWidth;
-                ctx.strokeStyle = this.gridLineColor;
-              } else {
-                // This is the first line on the scale
-                ctx.lineWidth = this.lineWidth;
-                ctx.strokeStyle = this.lineColor;
-              }
-
-              if (drawVerticalLine){
-                ctx.moveTo(linePos,this.endPoint);
-                ctx.lineTo(linePos,this.startPoint - 3);
-                ctx.stroke();
-                ctx.closePath();
-              }
-
-
               ctx.lineWidth = this.lineWidth;
               ctx.strokeStyle = this.lineColor;
-
-
-              // Small lines at the bottom of the base grid line
-              ctx.beginPath();
-              ctx.moveTo(linePos,this.endPoint);
-              ctx.lineTo(linePos,this.endPoint + 5);
-              ctx.stroke();
-              ctx.closePath();
 
               ctx.save();
               ctx.translate(xPos,(isRotated) ? this.endPoint + 12 : this.endPoint + 8);
