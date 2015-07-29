@@ -52,26 +52,28 @@
 
 			this.ScaleClass = Chart.Scale.extend({
 				offsetGridLines : true,
-				calculateBarX : function(datasetCount, datasetIndex, barIndex){
+				calculateBarX : function(datasetCount, datasetIndex, boxIndex){
 					//Reusable method for calculating the xPosition of a given bar based on datasetIndex & width of the bar
 					var xWidth = this.calculateBaseWidth(),
-						xAbsolute = this.calculateX(barIndex) - (xWidth/2),
-						barWidth = this.calculateBarWidth(datasetCount);
+						xAbsolute = this.calculateX(boxIndex) - (xWidth/2),
+						barWidth = this.calculateBoxWidth(datasetCount);
 
 					return xAbsolute + (barWidth * datasetIndex) + (datasetIndex * options.barDatasetSpacing) + barWidth/2;
 				},
 				calculateBaseWidth : function(){
-					return (this.calculateX(1) - this.calculateX(0)) - (2*options.barValueSpacing);
+					return this.calculateX(1) - this.calculateX(0);
 				},
-				calculateBarWidth : function(datasetCount){
+				calculateBoxWidth : function(datasetCount, dataCount){
 					//The padding between datasets is to the right of each bar, providing that there are more than 1 dataset
 					var baseWidth = this.calculateBaseWidth() - ((datasetCount - 1) * options.barDatasetSpacing);
+          var count = Math.max(datasetCount, dataCount);
 
-					return (baseWidth / datasetCount);
+					return this.calculateBaseWidth();
 				}
 			});
 
 			this.datasets = [];
+      this.dataLength = 0;
 
 			//Set up tooltip events on the chart
 			if (this.options.showTooltips){
@@ -94,7 +96,7 @@
 				strokeWidth : this.options.barStrokeWidth,
 				showStroke : this.options.barShowStroke,
 				ctx : this.chart.ctx,
-        draw: function(){
+        draw : function(){
           var ctx = this.ctx,
             halfWidth = this.width/2,
             drawWidth = this.width,
@@ -117,7 +119,6 @@
 
           helpers.drawRoundedRectangle(ctx, leftX, top, drawWidth, drawWidth, 4);
 
-
           ctx.fill();
           if (this.showStroke){
             ctx.stroke();
@@ -136,6 +137,10 @@
 					bars : []
 				};
 
+        if (dataset.data.length > this.dataLength){
+          this.dataLength = dataset.data.length;
+        }
+
 				this.datasets.push(datasetObject);
 
 				helpers.each(dataset.data,function(dataPoint,index){
@@ -145,7 +150,7 @@
 						label : data.labels[index],
 						datasetLabel: dataset.label,
 						strokeColor : dataset.strokeColor,
-						fillColor : dataset.fillColor,
+						fillColor : 'hsl(100,'+dataPoint*10+'%,50%)',//dataset.fillColor,
 						highlightFill : dataset.highlightFill || dataset.fillColor,
 						highlightStroke : dataset.highlightStroke || dataset.strokeColor
 					}));
@@ -159,7 +164,7 @@
 
 			this.eachBars(function(bar, index, datasetIndex){
 				helpers.extend(bar, {
-					width : this.scale.calculateBarWidth(this.datasets.length),
+					width : this.scale.calculateBoxWidth(this.datasets.length),
 					x: this.scale.calculateBarX(this.datasets.length, datasetIndex, index),
 					y: this.scale.endPoint
 				});
@@ -229,11 +234,11 @@
 				integersOnly : this.options.scaleIntegersOnly,
 				calculateYRange: function(currentHeight){
 					var updatedRanges = helpers.calculateScaleRange(
-						dataTotal(),
+            [0, self.datasets.length],
 						currentHeight,
 						this.fontSize,
-						this.beginAtZero,
-						this.integersOnly
+            false,
+            false
 					);
 					helpers.extend(this, updatedRanges);
 				},
@@ -271,7 +276,7 @@
 					label : label,
 					x: this.scale.calculateBarX(this.datasets.length, datasetIndex, this.scale.valuesCount+1),
 					y: this.scale.endPoint,
-					width : this.scale.calculateBarWidth(this.datasets.length),
+					width : this.scale.calculateBoxWidth(this.datasets.length),
 					base : this.scale.endPoint,
 					strokeColor : this.datasets[datasetIndex].strokeColor,
 					fillColor : this.datasets[datasetIndex].fillColor
@@ -316,9 +321,9 @@
 						bar.base = this.scale.endPoint;
 						//Transition then draw
 						bar.transition({
-							x : this.scale.calculateBarX(this.datasets.length, datasetIndex, index),
-							y : this.scale.calculateY(bar.value),
-							width : this.scale.calculateBarWidth(this.datasets.length)
+							x : this.scale.calculateX(index),
+							y : this.scale.calculateY(datasetIndex+1),
+							width : this.scale.calculateBoxWidth(this.datasets.length, this.dataLength)
 						}, easingDecimal).draw();
 					}
 				},this);
