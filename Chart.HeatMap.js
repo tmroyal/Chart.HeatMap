@@ -46,10 +46,10 @@
     colorHighlightMultiplier: 0.92,
 
     // Boolean - Whether to draw label data
-    labelData: false, 
+    showLabels: true, 
 
     // Number - the font size of the label as percentage of box height
-    labelSize: 0.9,
+    labelScale: 0.2,
 
     // String - label font family
     labelFontFamily: '"HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif',
@@ -58,9 +58,7 @@
     labelFontStyle: "normal",
 
     // String - label font color.
-    labelFontColor: "rgba(64,64,64,0.5)",
-
-    // String - template for tooltip
+    labelFontColor: "rgba(0,0,0,0.5)",
     tooltipTemplate: "<%= xLabel %> | <%= yLabel %> : <%= value %>",
 
     // String - template for legend generation
@@ -112,8 +110,6 @@
               if (this.showLabels){
                 ctx.fillText(labelString, xStart - 10, yLabelCenter);
               }
-
-
             },this);
 
             helpers.each(this.xLabels,function(label,index){
@@ -164,6 +160,10 @@
 			this.BoxClass = Chart.Rectangle.extend({
 				strokeWidth : this.options.strokeWidth,
 				showStroke : this.options.stroke,
+        fontColor : this.options.labelFontColor,
+        fontFamily : this.options.labelFontFamily,
+        fontScale : this.options.labelScale,
+        showLabels : this.options.showLabels,
 				ctx : this.chart.ctx,
         draw : function(){
           var ctx = this.ctx,
@@ -194,11 +194,11 @@
             ctx.stroke();
           }
 
-          if (this.label !== null && this.label !== undefined){
+          if (this.showLabels && this.label !== null && this.label !== undefined){
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
-            ctx.fillStyle = "rgba(0,0,0,0.5)";
-            ctx.font = this.height*0.5+"px Helvetica-Light";
+            ctx.fillStyle = this.fontColor;
+            ctx.font = this.height*this.fontScale+"px "+this.fontFamily;
             ctx.fillText(this.label, left+drawWidth*0.5, top+drawHeight*0.5);
           }
 
