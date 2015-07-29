@@ -6,40 +6,65 @@
 		helpers = Chart.helpers;
 
 	var defaultConfig = {
-		//Boolean - Whether the scale should start at zero, or an order of magnitude down from the lowest value
-		scaleBeginAtZero : false,
+    // Boolean - exchange x and y axes in the chart
+    rotate: false, 
 
-		//Boolean - Whether grid lines are shown across the chart
-		scaleShowGridLines : true,
+    // String - background color for graph
+    backgroundColor: '#fff',
 
-		//String - Colour of the grid lines
-		scaleGridLineColor : "rgba(0,0,0,.05)",
+    // Boolean - whether each square in the dataset is outlined
+    stroke: true,
 
-		//Number - Width of the grid lines
-		scaleGridLineWidth : 1,
+    // Number - width of the outline stroke.
+    strokeWidth: 2,
 
-		//Boolean - Whether to show horizontal lines (except X axis)
-		scaleShowHorizontalLines: true,
+    // String - the outline stroke color.
+    strokeColor: "rgb(255,255,255)",
 
-		//Boolean - Whether to show vertical lines (except Y axis)
-		scaleShowVerticalLines: true,
+    // Boolean - whether to draw the heat map boxes with rounded corners
+    rounded: true,
 
-		//Boolean - If there is a stroke on each bar
-		barShowStroke : true,
+    // Number - the radius (as a percentage of size) of the rounded corners
+    roundedRadius: 0.1,
 
-		//Number - Pixel width of the bar stroke
-		barStrokeWidth : 2,
+    // Number - padding between heat map boxes (as a percentage of box size)
+    boxPadding: 0.01,
 
-		//Number - Spacing between each of the X value sets
-		barValueSpacing : 5,
+    // String - "gradient", "palette"
+    colorInterpolation: "gradient",
 
-		//Number - Spacing between data sets within X values
-		barDatasetSpacing : 1,
+    // Array[String] - the colors used for the active color scheme.
+    // Any number of colors is allowed.
+    colors: [ "rgba(220,220,220,0.9)", "rgba(151,187,205,0.9)"],
 
-		//String - A legend template
-		legendTemplate : "<ul class=\"<%=name.toLowerCase()%>-legend\"><% for (var i=0; i<datasets.length; i++){%><li><span style=\"background-color:<%=datasets[i].fillColor%>\"></span><%if(datasets[i].label){%><%=datasets[i].label%><%}%></li><%}%></ul>",
+    // Boolean - whether boxes change color on hover.
+    colorHighlight: true, 
 
-    tooltipTemplate: "<%= xLabel %> | <%= yLabel %> : <%= value %>"
+    // Number - a floating point value which specifies how much lighter or
+    // darker a color becomes when hovered, where 1 is no change, 
+    // 0.9 is slightly darker, and 1.1 is slightly lighter.
+    colorHighlightMultiplier: 0.92,
+
+    // Boolean - Whether to draw label data
+    labelData: false, 
+
+    // Number - the font size of the label as percentage of box height
+    labelSize: 0.9,
+
+    // String - label font family
+    labelFontFamily: '"HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif',
+
+    // String - label font style
+    labelFontStyle: "normal",
+
+    // String - label font color.
+    labelFontColor: "rgba(64,64,64,0.5)",
+
+    // String - template for tooltip
+    tooltipTemplate: "<%= xLabel %> | <%= yLabel %> : <%= value %>",
+
+    // String - template for legend generation
+    legendTemplate : ""
 
 	};
 
@@ -54,14 +79,6 @@
 
 			this.ScaleClass = Chart.Scale.extend({
 				offsetGridLines : true,
-				calculateBarX : function(datasetCount, datasetIndex, boxIndex){
-					//Reusable method for calculating the xPosition of a given bar based on datasetIndex & width of the bar
-					var xWidth = this.calculateBaseWidth(),
-						xAbsolute = this.calculateX(boxIndex) - (xWidth/2),
-						barWidth = this.calculateBoxWidth(datasetCount);
-
-					return xAbsolute + (barWidth * datasetIndex) + (datasetIndex * options.barDatasetSpacing) + barWidth/2;
-				},
 				calculateBaseWidth : function(){
 					return this.calculateX(1) - this.calculateX(0);
 				},
@@ -93,7 +110,7 @@
               ctx.textAlign = "right";
               ctx.textBaseline = "middle";
               if (this.showLabels){
-                ctx.fillText(labelString,xStart - 10,yLabelCenter);
+                ctx.fillText(labelString, xStart - 10, yLabelCenter);
               }
 
 
@@ -145,8 +162,8 @@
 
 			//Declare the extension of the default point, to cater for the options passed in to the constructor
 			this.BoxClass = Chart.Rectangle.extend({
-				strokeWidth : this.options.barStrokeWidth,
-				showStroke : this.options.barShowStroke,
+				strokeWidth : this.options.strokeWidth,
+				showStroke : this.options.stroke,
 				ctx : this.chart.ctx,
         draw : function(){
           var ctx = this.ctx,
@@ -178,9 +195,10 @@
           }
 
           if (this.label !== null && this.label !== undefined){
-				ctx.textAlign = "center";
-				ctx.textBaseline = "middle";
-            ctx.fillStyle = 'black';
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillStyle = "rgba(0,0,0,0.5)";
+            ctx.font = this.height*0.5+"px Helvetica-Light";
             ctx.fillText(this.label, left+drawWidth*0.5, top+drawHeight*0.5);
           }
 
@@ -225,10 +243,10 @@
 
 			this.eachBars(function(bar, index, datasetIndex){
 				helpers.extend(bar, {
-					width : this.scale.calculateBoxWidth(this.datasets.length),
-					height : this.scale.calculateBoxHeight(this.datalength),
-					x: this.scale.calculateBarX(this.datasets.length, datasetIndex, index),
-					y: this.scale.endPoint
+							x : this.scale.calculateX(index),
+							y : this.scale.calculateY(datasetIndex+1),
+							width : this.scale.calculateBoxWidth(),
+							height : this.scale.calculateBoxHeight()
 				});
 				bar.save();
 			}, this);
@@ -308,7 +326,7 @@
 				showVerticalLines : this.options.scaleShowVerticalLines,
 				gridLineWidth : (this.options.scaleShowGridLines) ? this.options.scaleGridLineWidth : 0,
 				gridLineColor : (this.options.scaleShowGridLines) ? this.options.scaleGridLineColor : "rgba(0,0,0,0)",
-				padding : (this.options.showScale) ? 0 : (this.options.barShowStroke) ? this.options.barStrokeWidth : 0,
+				padding : (this.options.showScale) ? 0 : (this.options.stroke) ? this.options.strokeWidth : 0,
 				showLabels : this.options.scaleShowLabels,
 				display : this.options.showScale,
 			};
@@ -332,9 +350,12 @@
 				this.datasets[datasetIndex].bars.push(new this.BoxClass({
 					value : value,
 					label : label,
-					x: this.scale.calculateBarX(this.datasets.length, datasetIndex, this.scale.valuesCount),
-					y: this.scale.endPoint,
-					width : this.scale.calculateBoxWidth(this.datasets.length),
+
+          x : this.scale.calculateX(index),
+          y : this.scale.calculateY(datasetIndex+1),
+          width : this.scale.calculateBoxWidth(),
+          height : this.scale.calculateBoxHeight(),
+
 					base : this.scale.endPoint,
 					strokeColor : this.datasets[datasetIndex].strokeColor,
 					fillColor : this.datasets[datasetIndex].fillColor
