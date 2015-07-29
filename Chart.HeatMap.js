@@ -377,7 +377,8 @@
 						bar.transition({
 							x : this.scale.calculateX(index),
 							y : this.scale.calculateY(datasetIndex+1),
-							width : this.scale.calculateBoxWidth(this.datasets.length, this.dataLength)
+							width : this.scale.calculateBoxWidth(),
+							height : this.scale.calculateBoxHeight()
 						}, easingDecimal).draw();
 					}
 				},this);
