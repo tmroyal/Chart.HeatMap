@@ -5,10 +5,9 @@
 		Chart = root.Chart,
 		helpers = Chart.helpers;
 
-
 	var defaultConfig = {
 		//Boolean - Whether the scale should start at zero, or an order of magnitude down from the lowest value
-		scaleBeginAtZero : true,
+		scaleBeginAtZero : false,
 
 		//Boolean - Whether grid lines are shown across the chart
 		scaleShowGridLines : true,
@@ -44,7 +43,7 @@
 
 
 	Chart.Type.extend({
-		name: "Bar",
+		name: "HeatMap",
 		defaults : defaultConfig,
 		initialize:  function(data){
 
@@ -91,10 +90,40 @@
 			}
 
 			//Declare the extension of the default point, to cater for the options passed in to the constructor
-			this.BarClass = Chart.Rectangle.extend({
+			this.BoxClass = Chart.Rectangle.extend({
 				strokeWidth : this.options.barStrokeWidth,
 				showStroke : this.options.barShowStroke,
-				ctx : this.chart.ctx
+				ctx : this.chart.ctx,
+        draw: function(){
+          var ctx = this.ctx,
+            halfWidth = this.width/2,
+            drawWidth = this.width,
+            leftX = this.x - halfWidth,
+            top = this.y,
+            halfStroke = this.strokeWidth / 2;
+
+          // Canvas doesn't allow us to stroke inside the width so we can
+          // adjust the sizes to fit if we're setting a stroke on the line
+          if (this.showStroke){
+            leftX += halfStroke;
+            drawWidth -= this.strokeWidth;;
+            top += halfStroke;
+          }
+
+
+          ctx.fillStyle = this.fillColor;
+          ctx.strokeStyle = this.strokeColor;
+          ctx.lineWidth = this.strokeWidth;
+
+          helpers.drawRoundedRectangle(ctx, leftX, top, drawWidth, drawWidth, 4);
+
+
+          ctx.fill();
+          if (this.showStroke){
+            ctx.stroke();
+          }
+
+        }
 			});
 
 			//Iterate through each of the datasets, and build this into a property of the chart
@@ -111,7 +140,7 @@
 
 				helpers.each(dataset.data,function(dataPoint,index){
 					//Add a new point for each piece of data, passing any required data to draw.
-					datasetObject.bars.push(new this.BarClass({
+					datasetObject.bars.push(new this.BoxClass({
 						value : dataPoint,
 						label : data.labels[index],
 						datasetLabel: dataset.label,
@@ -126,7 +155,7 @@
 
 			this.buildScale(data.labels);
 
-			this.BarClass.prototype.base = this.scale.endPoint;
+			this.BoxClass.prototype.base = this.scale.endPoint;
 
 			this.eachBars(function(bar, index, datasetIndex){
 				helpers.extend(bar, {
@@ -237,7 +266,7 @@
 			//Map the values array for each of the datasets
 			helpers.each(valuesArray,function(value,datasetIndex){
 				//Add a new point for each piece of data, passing any required data to draw.
-				this.datasets[datasetIndex].bars.push(new this.BarClass({
+				this.datasets[datasetIndex].bars.push(new this.BoxClass({
 					value : value,
 					label : label,
 					x: this.scale.calculateBarX(this.datasets.length, datasetIndex, this.scale.valuesCount+1),
@@ -262,7 +291,7 @@
 			this.update();
 		},
 		reflow : function(){
-			helpers.extend(this.BarClass.prototype,{
+			helpers.extend(this.BoxClass.prototype,{
 				y: this.scale.endPoint,
 				base : this.scale.endPoint
 			});
