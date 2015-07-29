@@ -177,6 +177,13 @@
             ctx.stroke();
           }
 
+          if (this.label !== null && this.label !== undefined){
+				ctx.textAlign = "center";
+				ctx.textBaseline = "middle";
+            ctx.fillStyle = 'black';
+            ctx.fillText(this.label, left+drawWidth*0.5, top+drawHeight*0.5);
+          }
+
         }
 			});
 
@@ -201,7 +208,7 @@
 					//Add a new point for each piece of data, passing any required data to draw.
 					datasetObject.bars.push(new this.BoxClass({
 						value : dataPoint,
-						label : data.labels[index],
+						label : dataPoint,
 						datasetLabel: dataset.label,
 						strokeColor : dataset.strokeColor,
 						fillColor : 'hsla(100,'+dataPoint*10+'%,50%, 0.7)',//dataset.fillColor,
