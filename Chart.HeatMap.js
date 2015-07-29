@@ -69,7 +69,10 @@
           var count = Math.max(datasetCount, dataCount);
 
 					return this.calculateBaseWidth();
-				}
+				},
+        calculateBoxHeight: function(){
+          return this.calculateY(0) - this.calculateY(1);
+        }
 			});
 
 			this.datasets = [];
@@ -100,24 +103,25 @@
           var ctx = this.ctx,
             halfWidth = this.width/2,
             drawWidth = this.width,
-            leftX = this.x - halfWidth,
+            drawHeight = this.height,
+            left = this.x - halfWidth,
             top = this.y,
             halfStroke = this.strokeWidth / 2;
 
           // Canvas doesn't allow us to stroke inside the width so we can
           // adjust the sizes to fit if we're setting a stroke on the line
           if (this.showStroke){
-            leftX += halfStroke;
-            drawWidth -= this.strokeWidth;;
+            left += halfStroke;
+            drawWidth -= halfStroke;
+            drawHeight -= this.strokeWidth;;
             top += halfStroke;
           }
-
 
           ctx.fillStyle = this.fillColor;
           ctx.strokeStyle = this.strokeColor;
           ctx.lineWidth = this.strokeWidth;
 
-          helpers.drawRoundedRectangle(ctx, leftX, top, drawWidth, drawWidth, 4);
+          helpers.drawRoundedRectangle(ctx, left, top, drawWidth, drawHeight, 4);
 
           ctx.fill();
           if (this.showStroke){
@@ -165,6 +169,7 @@
 			this.eachBars(function(bar, index, datasetIndex){
 				helpers.extend(bar, {
 					width : this.scale.calculateBoxWidth(this.datasets.length),
+					height : this.scale.calculateBoxHeight(this.datalength),
 					x: this.scale.calculateBarX(this.datasets.length, datasetIndex, index),
 					y: this.scale.endPoint
 				});
@@ -274,7 +279,7 @@
 				this.datasets[datasetIndex].bars.push(new this.BoxClass({
 					value : value,
 					label : label,
-					x: this.scale.calculateBarX(this.datasets.length, datasetIndex, this.scale.valuesCount+1),
+					x: this.scale.calculateBarX(this.datasets.length, datasetIndex, this.scale.valuesCount),
 					y: this.scale.endPoint,
 					width : this.scale.calculateBoxWidth(this.datasets.length),
 					base : this.scale.endPoint,
