@@ -72,11 +72,128 @@
 				},
         calculateBoxHeight: function(){
           return this.calculateY(0) - this.calculateY(1);
+        },
+        buildYLabels : function(){
+          this.yLabelWidth = (this.display && this.showLabels) ? helpers.longestText(this.ctx,this.font,this.yLabels) : 0;
+        },
+        draw : function(){
+          var ctx = this.ctx,
+            yLabelGap = (this.endPoint - this.startPoint) / this.steps,
+            xStart = Math.round(this.xScalePaddingLeft);
+          if (this.display){
+            ctx.fillStyle = this.textColor;
+            ctx.font = this.font;
+            helpers.each(this.yLabels,function(labelString,index){
+              var yLabelCenter = this.endPoint - (yLabelGap * index),
+                linePositionY = Math.round(yLabelCenter),
+                drawHorizontalLine = this.showHorizontalLines;
+
+              ctx.textAlign = "right";
+              ctx.textBaseline = "middle";
+              if (this.showLabels){
+                ctx.fillText(labelString,xStart - 10,yLabelCenter);
+              }
+
+              // This is X axis, so draw it
+              if (index === 0 && !drawHorizontalLine){
+                drawHorizontalLine = true;
+              }
+
+              if (drawHorizontalLine){
+                ctx.beginPath();
+              }
+
+              if (index > 0){
+                // This is a grid line in the centre, so drop that
+                ctx.lineWidth = this.gridLineWidth;
+                ctx.strokeStyle = this.gridLineColor;
+              } else {
+                // This is the first line on the scale
+                ctx.lineWidth = this.lineWidth;
+                ctx.strokeStyle = this.lineColor;
+              }
+
+              linePositionY += helpers.aliasPixel(ctx.lineWidth);
+
+              if(drawHorizontalLine){
+                ctx.moveTo(xStart, linePositionY);
+                ctx.lineTo(this.width, linePositionY);
+                ctx.stroke();
+                ctx.closePath();
+              }
+
+              ctx.lineWidth = this.lineWidth;
+              ctx.strokeStyle = this.lineColor;
+              ctx.beginPath();
+              ctx.moveTo(xStart - 5, linePositionY);
+              ctx.lineTo(xStart, linePositionY);
+              ctx.stroke();
+              ctx.closePath();
+
+            },this);
+
+            helpers.each(this.xLabels,function(label,index){
+              var xPos = this.calculateX(index) + helpers.aliasPixel(this.lineWidth),
+                // Check to see if line/bar here and decide where to place the line
+                linePos = this.calculateX(index - (this.offsetGridLines ? 0.5 : 0)) + helpers.aliasPixel(this.lineWidth),
+                isRotated = (this.xLabelRotation > 0),
+                drawVerticalLine = this.showVerticalLines;
+
+              // This is Y axis, so draw it
+              if (index === 0 && !drawVerticalLine){
+                drawVerticalLine = true;
+              }
+
+              if (drawVerticalLine){
+                ctx.beginPath();
+              }
+
+              if (index > 0){
+                // This is a grid line in the centre, so drop that
+                ctx.lineWidth = this.gridLineWidth;
+                ctx.strokeStyle = this.gridLineColor;
+              } else {
+                // This is the first line on the scale
+                ctx.lineWidth = this.lineWidth;
+                ctx.strokeStyle = this.lineColor;
+              }
+
+              if (drawVerticalLine){
+                ctx.moveTo(linePos,this.endPoint);
+                ctx.lineTo(linePos,this.startPoint - 3);
+                ctx.stroke();
+                ctx.closePath();
+              }
+
+
+              ctx.lineWidth = this.lineWidth;
+              ctx.strokeStyle = this.lineColor;
+
+
+              // Small lines at the bottom of the base grid line
+              ctx.beginPath();
+              ctx.moveTo(linePos,this.endPoint);
+              ctx.lineTo(linePos,this.endPoint + 5);
+              ctx.stroke();
+              ctx.closePath();
+
+              ctx.save();
+              ctx.translate(xPos,(isRotated) ? this.endPoint + 12 : this.endPoint + 8);
+              ctx.rotate(helpers.radians(this.xLabelRotation)*-1);
+              ctx.font = this.font;
+              ctx.textAlign = (isRotated) ? "right" : "center";
+              ctx.textBaseline = (isRotated) ? "middle" : "top";
+              ctx.fillText(label, 0, 0);
+              ctx.restore();
+            },this);
+          }
         }
+
 			});
 
 			this.datasets = [];
       this.dataLength = 0;
+      this.yLabels = [];
 
 			//Set up tooltip events on the chart
 			if (this.options.showTooltips){
@@ -146,6 +263,7 @@
         }
 
 				this.datasets.push(datasetObject);
+        this.yLabels.push(dataset.label);
 
 				helpers.each(dataset.data,function(dataPoint,index){
 					//Add a new point for each piece of data, passing any required data to draw.
@@ -154,7 +272,7 @@
 						label : data.labels[index],
 						datasetLabel: dataset.label,
 						strokeColor : dataset.strokeColor,
-						fillColor : 'hsl(100,'+dataPoint*10+'%,50%)',//dataset.fillColor,
+						fillColor : 'hsla(100,'+dataPoint*10+'%,50%, 0.7)',//dataset.fillColor,
 						highlightFill : dataset.highlightFill || dataset.fillColor,
 						highlightStroke : dataset.highlightStroke || dataset.strokeColor
 					}));
@@ -162,7 +280,7 @@
 
 			},this);
 
-			this.buildScale(data.labels);
+			this.buildScale(data.labels, this.yLabels);
 
 			this.BoxClass.prototype.base = this.scale.endPoint;
 
@@ -214,7 +332,7 @@
 
 			return barsArray;
 		},
-		buildScale : function(labels){
+		buildScale : function(labels, yLabels){
 			var self = this;
 
 			var dataTotal = function(){
@@ -243,11 +361,12 @@
 						currentHeight,
 						this.fontSize,
             false,
-            false
+            true
 					);
 					helpers.extend(this, updatedRanges);
 				},
 				xLabels : labels,
+        yLabels : yLabels,
 				font : helpers.fontString(this.options.scaleFontSize, this.options.scaleFontStyle, this.options.scaleFontFamily),
 				lineWidth : this.options.scaleLineWidth,
 				lineColor : this.options.scaleLineColor,
@@ -257,7 +376,7 @@
 				gridLineColor : (this.options.scaleShowGridLines) ? this.options.scaleGridLineColor : "rgba(0,0,0,0)",
 				padding : (this.options.showScale) ? 0 : (this.options.barShowStroke) ? this.options.barStrokeWidth : 0,
 				showLabels : this.options.scaleShowLabels,
-				display : this.options.showScale
+				display : this.options.showScale,
 			};
 
 			if (this.options.scaleOverride){
