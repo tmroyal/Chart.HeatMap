@@ -6,9 +6,6 @@
 		helpers = Chart.helpers;
 
 	var defaultConfig = {
-    // Boolean - exchange x and y axes in the chart
-    rotate: false, 
-
     // String - background color for graph
     backgroundColor: '#fff',
 
@@ -257,6 +254,9 @@
 				},this);
 
 			},this);
+
+      this.datasets.reverse();
+      this.yLabels.reverse();
 
 			this.buildScale(data.labels, this.yLabels);
 
