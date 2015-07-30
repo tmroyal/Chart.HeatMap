@@ -28,7 +28,7 @@
     roundedRadius: 0.15,
 
     // Number - padding between heat map boxes (as a percentage of box size)
-    boxPadding: 0.1,
+    paddingScale: 0.5,
 
     // String - "gradient", "palette"
     colorInterpolation: "gradient",
@@ -168,6 +168,7 @@
         fontScale : this.options.labelScale,
         showLabels : this.options.showLabels,
         radiusScale : this.options.rounded ? this.options.roundedRadius : 0,
+        paddingScale : this.options.paddingScale,
 				ctx : this.chart.ctx,
         draw : function(){
           var ctx = this.ctx,
@@ -176,8 +177,16 @@
             drawHeight = this.height,
             left = this.x - halfWidth,
             top = this.y,
-            halfStroke = this.strokeWidth / 2;
+            halfStroke = this.strokeWidth / 2,
+            leftPadding = this.paddingScale*drawWidth,
+            topPadding = this.paddingScale*drawHeight;
 
+          left += leftPadding*0.5;
+          top += topPadding*0.5;
+          drawWidth -= leftPadding;
+          drawHeight -= topPadding;
+          
+          
           // Canvas doesn't allow us to stroke inside the width so we can
           // adjust the sizes to fit if we're setting a stroke on the line
           if (this.showStroke){
@@ -203,7 +212,7 @@
             ctx.textBaseline = "middle";
             ctx.fillStyle = this.fontColor;
             ctx.font = this.height*this.fontScale+"px "+this.fontFamily;
-            ctx.fillText(this.label, left+drawWidth*0.5, top+drawHeight*0.5);
+            ctx.fillText(this.value, left+drawWidth*0.5, top+drawHeight*0.5);
           }
 
         }
@@ -224,11 +233,12 @@
 				this.datasets.push(datasetObject);
         this.yLabels.push(dataset.label);
 
+
 				helpers.each(dataset.data,function(dataPoint,index){
 					//Add a new point for each piece of data, passing any required data to draw.
 					datasetObject.bars.push(new this.BoxClass({
 						value : dataPoint,
-						label : dataPoint,
+						label : data.labels[index],
 						datasetLabel: dataset.label,
 						strokeColor : this.options.strokeColor,
 						fillColor : 'hsla(100,'+dataPoint*10+'%,50%, 0.7)',//dataset.fillColor,
