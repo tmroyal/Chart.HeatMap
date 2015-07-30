@@ -25,7 +25,7 @@
     rounded: true,
 
     // Number - the radius (as a percentage of size) of the rounded corners
-    roundedRadius: 0.1,
+    roundedRadius: 0.15,
 
     // Number - padding between heat map boxes (as a percentage of box size)
     boxPadding: 0.01,
@@ -164,6 +164,7 @@
         fontFamily : this.options.labelFontFamily,
         fontScale : this.options.labelScale,
         showLabels : this.options.showLabels,
+        radiusScale : this.options.rounded ? this.options.roundedRadius : 0,
 				ctx : this.chart.ctx,
         draw : function(){
           var ctx = this.ctx,
@@ -187,7 +188,7 @@
           ctx.strokeStyle = this.strokeColor;
           ctx.lineWidth = this.strokeWidth;
 
-          helpers.drawRoundedRectangle(ctx, left, top, drawWidth, drawHeight, 4);
+          helpers.drawRoundedRectangle(ctx, left, top, drawWidth, drawHeight, this.radiusScale*this.width);
 
           ctx.fill();
           if (this.showStroke){
