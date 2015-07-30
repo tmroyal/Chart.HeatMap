@@ -255,6 +255,7 @@
 
 			},this);
 
+      // could not manage to invert the y scale
       this.datasets.reverse();
       this.yLabels.reverse();
 
@@ -443,12 +444,11 @@
 						bar.transition({
 							x : this.scale.calculateX(index),
 							y : this.scale.calculateY(datasetIndex+1),
-							width : this.scale.calculateBoxWidth(),
-							height : this.scale.calculateBoxHeight()
+							width : this.scale.calculateBoxWidth()+1,
+							height : this.scale.calculateBoxHeight()+1
 						}, easingDecimal).draw();
 					}
 				},this);
-
 			},this);
 		}
 	});
