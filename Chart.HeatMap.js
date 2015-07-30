@@ -356,22 +356,27 @@
 
 			this.scale = new this.ScaleClass(scaleOptions);
 		},
+    addDataset: function(values, label){
+    },
 		addData : function(valuesArray,label){
-			//Map the values array for each of the datasets
+      valuesArray = valuesArray.concat().reverse(); // reverse to handle inverted scale
+
+      var xValue = this.datasets[0].bars.length;
+
 			helpers.each(valuesArray,function(value,datasetIndex){
 				//Add a new point for each piece of data, passing any required data to draw.
+        var color = this.colorManager.getColor(value);
 				this.datasets[datasetIndex].bars.push(new this.BoxClass({
 					value : value,
 					label : label,
-
-          x : this.scale.calculateX(index),
+          x : this.scale.calculateX(xValue),
           y : this.scale.calculateY(datasetIndex+1),
-          width : this.scale.calculateBoxWidth(),
-          height : this.scale.calculateBoxHeight(),
-
-					base : this.scale.endPoint,
-					strokeColor : this.datasets[datasetIndex].strokeColor,
-					fillColor : this.datasets[datasetIndex].fillColor
+          width : this.scale.calculateBoxWidth()+1,
+          height : this.scale.calculateBoxHeight()+1,
+          strokeColor : this.options.strokeColor,
+          fillColor : color.color,
+          highlightFill : color.highlight, 
+          highlightStroke : this.options.highlightStrokeColor
 				}));
 			},this);
 
