@@ -19,7 +19,7 @@
     strokeWidth: 2,
 
     // String - the outline stroke color.
-    strokeColor: "rgb(255,255,255)",
+    strokeColor: "rgb(64,64,64)",
 
     // Boolean - whether to draw the heat map boxes with rounded corners
     rounded: true,
@@ -28,7 +28,7 @@
     roundedRadius: 0.15,
 
     // Number - padding between heat map boxes (as a percentage of box size)
-    boxPadding: 0.01,
+    boxPadding: 0.1,
 
     // String - "gradient", "palette"
     colorInterpolation: "gradient",
@@ -59,6 +59,8 @@
 
     // String - label font color.
     labelFontColor: "rgba(0,0,0,0.5)",
+
+    // String - tooltipTemplate
     tooltipTemplate: "<%= xLabel %> | <%= yLabel %> : <%= value %>",
 
     // String - template for legend generation
@@ -159,6 +161,7 @@
 			//Declare the extension of the default point, to cater for the options passed in to the constructor
 			this.BoxClass = Chart.Rectangle.extend({
 				strokeWidth : this.options.strokeWidth,
+				strokeColor : this.options.strokeColor,
 				showStroke : this.options.stroke,
         fontColor : this.options.labelFontColor,
         fontFamily : this.options.labelFontFamily,
@@ -211,8 +214,6 @@
 
 				var datasetObject = {
 					label : dataset.label || null,
-					fillColor : dataset.fillColor,
-					strokeColor : dataset.strokeColor,
 					bars : []
 				};
 
@@ -229,10 +230,10 @@
 						value : dataPoint,
 						label : dataPoint,
 						datasetLabel: dataset.label,
-						strokeColor : dataset.strokeColor,
+						strokeColor : this.options.strokeColor,
 						fillColor : 'hsla(100,'+dataPoint*10+'%,50%, 0.7)',//dataset.fillColor,
 						highlightFill : 'hsla(200,'+dataPoint*10+'%,50%, 0.7)',//dataset.fillColor,
-						highlightStroke : 'transparent' //dataset.highlightStroke || dataset.strokeColor
+						highlightStroke : this.options.strokeColor,
 					}));
 				},this);
 
