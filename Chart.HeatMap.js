@@ -13,22 +13,22 @@
     backgroundColor: '#fff',
 
     // Boolean - whether each square in the dataset is outlined
-    stroke: true,
+    stroke: false,
 
     // Number - width of the outline stroke.
-    strokeWidth: 2,
+    strokeWidth: 1,
 
     // String - the outline stroke color.
-    strokeColor: "rgb(64,64,64)",
+    strokeColor: "rgba(0,0,0,0.5)",
 
     // Boolean - whether to draw the heat map boxes with rounded corners
     rounded: true,
 
     // Number - the radius (as a percentage of size) of the rounded corners
-    roundedRadius: 0.15,
+    roundedRadius: 0.1,
 
     // Number - padding between heat map boxes (as a percentage of box size)
-    paddingScale: 0.5,
+    paddingScale: 0.05,
 
     // String - "gradient", "palette"
     colorInterpolation: "gradient",
