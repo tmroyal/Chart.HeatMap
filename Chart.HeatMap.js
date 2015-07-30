@@ -16,10 +16,10 @@
     stroke: false,
 
     // Number - width of the outline stroke.
-    strokeWidth: 1,
+    strokePerc: 0.05,
 
     // String - the outline stroke color.
-    strokeColor: "rgba(0,0,0,0.5)",
+    strokeColor: "rgb(128,128,128)",
 
     // Boolean - whether to draw the heat map boxes with rounded corners
     rounded: true,
@@ -163,7 +163,7 @@
 
 			//Declare the extension of the default point, to cater for the options passed in to the constructor
 			this.BoxClass = Chart.Rectangle.extend({
-				strokeWidth : this.options.strokeWidth,
+				strokePerc : this.options.strokePerc,
 				strokeColor : this.options.strokeColor,
 				showStroke : this.options.stroke,
         fontColor : this.options.labelFontColor,
@@ -180,7 +180,8 @@
             drawHeight = this.height,
             left = this.x - halfWidth,
             top = this.y,
-            halfStroke = this.strokeWidth / 2,
+            strokeWidth = this.strokePerc * this.width,
+            halfStroke = strokeWidth / 2,
             leftPadding = this.paddingScale*drawWidth,
             topPadding = this.paddingScale*drawHeight;
 
@@ -195,13 +196,13 @@
           if (this.showStroke){
             left += halfStroke;
             drawWidth -= halfStroke;
-            drawHeight -= this.strokeWidth;;
+            drawHeight -= halfStroke;
             top += halfStroke;
           }
 
           ctx.fillStyle = this.fillColor;
           ctx.strokeStyle = this.strokeColor;
-          ctx.lineWidth = this.strokeWidth;
+          ctx.lineWidth = strokeWidth;
 
           helpers.drawRoundedRectangle(ctx, left, top, drawWidth, drawHeight, this.radiusScale*this.width);
 
