@@ -76,6 +76,9 @@
 
 			//Expose options as a scope variable here so we can access it in the ScaleClass
 			var options = this.options;
+      
+      this.colorManager = new ColorManager();
+      this.colorManager.setup(data,this.options.colors,this.options);
 
 			this.ScaleClass = Chart.Scale.extend({
 				offsetGridLines : true,
@@ -226,6 +229,7 @@
 					bars : []
 				};
 
+
         if (dataset.data.length > this.dataLength){
           this.dataLength = dataset.data.length;
         }
@@ -235,14 +239,15 @@
 
 
 				helpers.each(dataset.data,function(dataPoint,index){
+          var color = this.colorManager.getColor(dataPoint);
 					//Add a new point for each piece of data, passing any required data to draw.
 					datasetObject.bars.push(new this.BoxClass({
 						value : dataPoint,
 						label : data.labels[index],
 						datasetLabel: dataset.label,
 						strokeColor : this.options.strokeColor,
-						fillColor : 'hsla(100,'+dataPoint*10+'%,50%, 0.7)',//dataset.fillColor,
-						highlightFill : 'hsla(200,'+dataPoint*10+'%,50%, 0.7)',//dataset.fillColor,
+						fillColor : color.color,
+						highlightFill : color.highlight, 
 						highlightStroke : this.options.strokeColor,
 					}));
 				},this);
