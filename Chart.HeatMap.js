@@ -438,20 +438,15 @@
 			//Draw all the bars for each dataset
 			helpers.each(this.datasets,function(dataset,datasetIndex){
 				helpers.each(dataset.bars,function(bar,index){
-					if (bar.hasValue()){
-						bar.base = this.scale.endPoint;
-						//Transition then draw
-						bar.transition({
-							x : this.scale.calculateX(index),
-							y : this.scale.calculateY(datasetIndex+1),
-							width : this.scale.calculateBoxWidth()+1,
-							height : this.scale.calculateBoxHeight()+1
-						}, easingDecimal).draw();
-					}
+          bar.transition({
+            x : this.scale.calculateX(index),
+            y : this.scale.calculateY(datasetIndex+1),
+            width : this.scale.calculateBoxWidth()+1,
+            height : this.scale.calculateBoxHeight()+1
+          }, easingDecimal).draw();
 				},this);
 			},this);
 		}
 	});
-
 
 }).call(this);
