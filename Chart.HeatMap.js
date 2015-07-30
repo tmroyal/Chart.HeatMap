@@ -21,6 +21,9 @@
     // String - the outline stroke color.
     strokeColor: "rgb(128,128,128)",
 
+    // String - the outline stroke color.
+    highlightStrokeColor: "rgb(192,192,192)",
+
     // Boolean - whether to draw the heat map boxes with rounded corners
     rounded: true,
 
@@ -249,7 +252,7 @@
 						strokeColor : this.options.strokeColor,
 						fillColor : color.color,
 						highlightFill : color.highlight, 
-						highlightStroke : this.options.strokeColor,
+						highlightStroke : this.options.highlightStrokeColor,
 					}));
 				},this);
 
