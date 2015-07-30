@@ -329,13 +329,13 @@
 				beginAtZero : this.options.scaleBeginAtZero,
 				integersOnly : this.options.scaleIntegersOnly,
 				calculateYRange: function(currentHeight){
-					var updatedRanges = helpers.calculateScaleRange(
-            [0, self.datasets.length],
-						currentHeight,
-						this.fontSize,
-            false,
-            true
-					);
+          var updatedRanges = {
+            min: 0,
+            max: self.datasets.length, 
+            steps: self.datasets.length, 
+            stepValue: 1
+          };
+
 					helpers.extend(this, updatedRanges);
 				},
 				xLabels : labels,
@@ -352,15 +352,6 @@
 				display : this.options.showScale,
 			};
 
-			if (this.options.scaleOverride){
-				helpers.extend(scaleOptions, {
-					calculateYRange: helpers.noop,
-					steps: this.options.scaleSteps,
-					stepValue: this.options.scaleStepWidth,
-					min: this.options.scaleStartValue,
-					max: this.options.scaleStartValue + (this.options.scaleSteps * this.options.scaleStepWidth)
-				});
-			}
 
 			this.scale = new this.ScaleClass(scaleOptions);
 		},
