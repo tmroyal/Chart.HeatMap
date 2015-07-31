@@ -94,45 +94,4 @@ var ColorManager = function(){
     } 
   };
 
-
-  function applyColors(colors, layers, colorHighlightMultiplier){
-    var results = [];
-    var scaleFactor;
-    var colorFunction;
-
-    if (options.colorInterpolation === 'gradient'){
-      colorFunction = getGradientColor;
-      scaleFactor = (colors.length-1)/(layers.length-1);
-    } else {
-      colorFunction = getIndexedColor;
-      scaleFactor = colors.length/layers.length;
-    }
-
-    // this function returns a copy of the layers
-    var orderedLayers = getLayersInColorOrder(layers, options);
-    var clr, hclr;
-
-    for (var i = 0; i < orderedLayers.length; i++){
-      if (orderedLayers[i].fillColor){
-        if (orderedLayers[i].highlightColor){
-          orderedLayers[i].color = orderedLayers[i].fillColor;
-          orderedLayers[i].hoverColor = orderedLayers[i].highlightColor;
-        } else {
-          clr = cssColorToObject(orderedLayers[i].fillColor);
-          hclr = getHighlightColor(clr, options);
-          orderedLayers[i].color = rgbString(clr.r, clr.g, clr.b, clr.a);
-          orderedLayers[i].hoverColor = rgbString(hclr.r, hclr.g, hclr.b, hclr.a);
-        }
-      } else {
-        clr = colorFunction(colors, i, scaleFactor);
-        hclr = getHighlightColor(clr, options);
-        orderedLayers[i].color = rgbString(clr.r, clr.g, clr.b, clr.a);
-        orderedLayers[i].hoverColor = rgbString(hclr.r, hclr.g, hclr.b, hclr.a);
-      }
-
-    }
-
-    return layers;
-  }
-
 };

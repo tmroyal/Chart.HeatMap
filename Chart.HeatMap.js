@@ -97,8 +97,8 @@
 					return this.calculateX(1) - this.calculateX(0);
 				},
 				calculateBoxWidth : function(datasetCount, dataCount){
-					//The padding between datasets is to the right of each bar, providing that there are more than 1 dataset
-					var baseWidth = this.calculateBaseWidth() - ((datasetCount - 1) * options.barDatasetSpacing);
+					//The padding between datasets is to the right of each box, providing that there are more than 1 dataset
+					var baseWidth = this.calculateBaseWidth() - datasetCount - 1;
           var count = Math.max(datasetCount, dataCount);
 
 					return this.calculateBaseWidth();
@@ -130,7 +130,7 @@
 
             helpers.each(this.xLabels,function(label,index){
               var xPos = this.calculateX(index) + helpers.aliasPixel(this.lineWidth),
-                // Check to see if line/bar here and decide where to place the line
+                // Check to see if line/box here and decide where to place the line
                 linePos = this.calculateX(index - (this.offsetGridLines ? 0.5 : 0)) + helpers.aliasPixel(this.lineWidth),
                 isRotated = (this.xLabelRotation > 0),
                 drawVerticalLine = this.showVerticalLines;
@@ -154,23 +154,24 @@
 			});
 
 			this.datasets = [];
-      this.dataLength = 0;
       this.yLabels = [];
       this.xLabels = data.labels;
 
 			//Set up tooltip events on the chart
 			if (this.options.showTooltips){
 				helpers.bindEvents(this, this.options.tooltipEvents, function(evt){
-					var activeBars = (evt.type !== 'mouseout') ? this.getBarsAtEvent(evt) : [];
+					var activeBoxes = (evt.type !== 'mouseout') ? this.getBoxesAtEvent(evt) : [];
 
-					this.eachBars(function(bar){
-						bar.restore(['fillColor', 'strokeColor']);
+					this.eachBoxes(function(box){
+						box.restore(['fillColor', 'strokeColor']);
 					});
-					helpers.each(activeBars, function(activeBar){
-						activeBar.fillColor = activeBar.highlightFill;
-						activeBar.strokeColor = activeBar.highlightStroke;
+
+					helpers.each(activeBoxes, function(activeBox){
+						activeBox.fillColor = activeBox.highlightFill;
+						activeBox.strokeColor = activeBox.highlightStroke;
 					});
-					this.showTooltip(activeBars);
+
+					this.showTooltip(activeBoxes);
 				});
 			}
 
@@ -185,7 +186,9 @@
         showLabels : this.options.showLabels,
         radiusScale : this.options.rounded ? this.options.roundedRadius : 0,
         paddingScale : this.options.paddingScale,
+
 				ctx : this.chart.ctx,
+
         draw : function(){
           var ctx = this.ctx,
             halfWidth = this.width/2,
@@ -240,18 +243,14 @@
 
 				var datasetObject = {
 					label : dataset.label || null,
-					bars : []
+					boxes : []
 				};
-
-        if (dataset.data.length > this.dataLength){
-          this.dataLength = dataset.data.length;
-        }
 
 				this.datasets.push(datasetObject);
         this.yLabels.push(dataset.label);
 
 				helpers.each(dataset.data,function(dataPoint,index){
-					datasetObject.bars.push(new this.BoxClass({
+					datasetObject.boxes.push(new this.BoxClass({
 						value : dataPoint,
 						label : this.xLabels[index],
 						datasetLabel: dataset.label,
@@ -264,7 +263,10 @@
 
 			},this);
 
-      // could not manage to invert the y scale
+      // chart.js has a y at bottom philosophy
+      // that has made it difficult to be
+      // able to simply redo the scale
+      // coming soon
       this.datasets.reverse();
       this.yLabels.reverse();
 
@@ -272,14 +274,14 @@
 
 			this.BoxClass.prototype.base = this.scale.endPoint;
 
-			this.eachBars(function(bar, index, datasetIndex){
-				helpers.extend(bar, {
+			this.eachBoxes(function(box, index, datasetIndex){
+				helpers.extend(box, {
 							x : this.scale.calculateX(index),
 							y : this.scale.calculateY(datasetIndex+1),
 							width : this.scale.calculateBoxWidth(),
 							height : this.scale.calculateBoxHeight()
 				});
-				bar.save();
+				box.save();
 			}, this);
 
       this.findMaxAndMin(true);
@@ -294,24 +296,25 @@
 				activeElement.restore(['fillColor', 'strokeColor']);
 			});
 
-			this.eachBars(function(bar){
-				bar.save();
+			this.eachBoxes(function(box){
+				box.save();
 			});
+
 			this.render();
 		},
-		eachBars : function(callback){
+		eachBoxes : function(callback){
 			helpers.each(this.datasets,function(dataset, datasetIndex){
-				helpers.each(dataset.bars, callback, this, datasetIndex);
+				helpers.each(dataset.boxes, callback, this, datasetIndex);
 			},this);
 		},
-		getBarsAtEvent : function(e){
+		getBoxesAtEvent : function(e){
       var eventPosition = helpers.getRelativePosition(e),
-        barIndex;
+        boxIndex;
 
 			for (var datasetIndex = 0; datasetIndex < this.datasets.length; datasetIndex++) {
-				for (barIndex = 0; barIndex < this.datasets[datasetIndex].bars.length; barIndex++) {
-					if (this.datasets[datasetIndex].bars[barIndex].inRange(eventPosition.x,eventPosition.y)){
-						return [this.datasets[datasetIndex].bars[barIndex]];
+				for (boxIndex = 0; boxIndex < this.datasets[datasetIndex].boxes.length; boxIndex++) {
+					if (this.datasets[datasetIndex].boxes[boxIndex].inRange(eventPosition.x,eventPosition.y)){
+						return [this.datasets[datasetIndex].boxes[boxIndex]];
 					}
 				}
 			}
@@ -323,8 +326,8 @@
 
 			var dataTotal = function(){
 				var values = [];
-				self.eachBars(function(bar){
-					values.push(bar.value);
+				self.eachBoxes(function(box){
+					values.push(box.value);
 				});
 				return values;
 			};
@@ -365,19 +368,19 @@
 				display : this.options.showScale,
 			};
 
-
 			this.scale = new this.ScaleClass(scaleOptions);
 		},
+
     addDataset: function(values, label){
       var datasetObject = {
         label: label,
-        bars: []
+        boxes: []
       };
       var datasetIndex = this.datasets.length;
 
       helpers.each(values,function(dataPoint,index){
 
-        datasetObject.bars.push(new this.BoxClass({
+        datasetObject.boxes.push(new this.BoxClass({
           value : dataPoint,
           label : this.xLabels[index],
           x : this.scale.calculateX(index),
@@ -424,11 +427,11 @@
         this.options.colorHighlightMultiplier
       );
 
-      this.eachBars(function(bar){
-        var clr = this.colorManager.getColor(bar.value);
-        bar.fillColor = clr.color;
-        bar.highlightFill = clr.highlight;
-        bar.save();
+      this.eachBoxes(function(box){
+        var clr = this.colorManager.getColor(box.value);
+        box.fillColor = clr.color;
+        box.highlightFill = clr.highlight;
+        box.save();
       });
     },
 
@@ -437,20 +440,19 @@
         this.min = Infinity;
         this.max = -Infinity; 
       }
-      this.eachBars(function(bar,index,datasetIndex){
-        if (bar.value > this.max) { this.max = bar.value; }
-        if (bar.value < this.min) { this.min = bar.value; }
+      this.eachBoxes(function(box,index,datasetIndex){
+        if (box.value > this.max) { this.max = box.value; }
+        if (box.value < this.min) { this.min = box.value; }
       });
     },
 
 		addData : function(valuesArray,label){
       valuesArray = valuesArray.concat().reverse(); // reverse to handle inverted scale
 
-      var xValue = this.datasets[0].bars.length;
+      var xValue = this.datasets[0].boxes.length;
 
 			helpers.each(valuesArray,function(value,datasetIndex){
-				//Add a new point for each piece of data, passing any required data to draw.
-				this.datasets[datasetIndex].bars.push(new this.BoxClass({
+				this.datasets[datasetIndex].boxes.push(new this.BoxClass({
 					value : value,
 					label : label,
           datasetLabel: this.datasets[datasetIndex].label,
@@ -466,14 +468,12 @@
       this.findMaxAndMin(true);
       this.applyColor();
 			this.scale.addXLabel(label);
-			//Then re-render the chart.
 			this.update();
 		},
 		removeData : function(){
 			this.scale.removeXLabel();
-			//Then re-render the chart.
 			helpers.each(this.datasets,function(dataset){
-				dataset.bars.shift();
+				dataset.boxes.shift();
 			},this);
       this.findMaxAndMin(true);
       this.applyColors();
@@ -523,13 +523,11 @@
 			var easingDecimal = ease || 1;
 			this.clear();
 
-			var ctx = this.chart.ctx;
-
 			this.scale.draw(easingDecimal);
 
-			//Draw all the bars for each dataset
-			this.eachBars(function(bar, index, datasetIndex){
-          bar.transition({
+			//Draw all the boxes for each dataset
+			this.eachBoxes(function(box, index, datasetIndex){
+          box.transition({
             x : this.scale.calculateX(index),
             y : this.scale.calculateY(datasetIndex+1),
             width : this.scale.calculateBoxWidth()+1,
