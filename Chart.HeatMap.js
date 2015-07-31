@@ -144,6 +144,7 @@
 			this.datasets = [];
       this.dataLength = 0;
       this.yLabels = [];
+      this.xLabels = data.labels;
 
 			//Set up tooltip events on the chart
 			if (this.options.showTooltips){
@@ -244,7 +245,7 @@
 					//Add a new point for each piece of data, passing any required data to draw.
 					datasetObject.bars.push(new this.BoxClass({
 						value : dataPoint,
-						label : data.labels[index],
+						label : this.xLabels[index],
 						datasetLabel: dataset.label,
 						strokeColor : this.options.strokeColor,
 						fillColor : color.color,
@@ -357,7 +358,41 @@
 			this.scale = new this.ScaleClass(scaleOptions);
 		},
     addDataset: function(values, label){
+      var datasetObject = {
+        label: label,
+        bars: []
+      };
+      var datasetIndex = this.datasets.length;
+
+      helpers.each(values,function(dataPoint,index){
+        var color = this.colorManager.getColor(dataPoint);
+
+        datasetObject.bars.push(new this.BoxClass({
+          value : dataPoint,
+          label : this.xLabels[index],
+          x : this.scale.calculateX(index),
+          y : this.scale.calculateY(0),
+          width : this.scale.calculateBoxWidth()+1,
+          height : this.scale.calculateBoxHeight()+1,
+          datasetLabel: label,
+          strokeColor : this.options.strokeColor,
+          fillColor : color.color,
+          highlightFill : color.highlight, 
+          highlightStroke : this.options.highlightStrokeColor,
+        }));
+      },this);
+
+
+      this.datasets.unshift(datasetObject);
+      this.scale.yLabels.unshift(label);
+      this.scale.steps += 1;
+      this.scale.max += 1;
+      this.scale.fit();
+      this.update();
+
+      console.log(this.datasets);
     },
+
 		addData : function(valuesArray,label){
       valuesArray = valuesArray.concat().reverse(); // reverse to handle inverted scale
 
@@ -369,6 +404,7 @@
 				this.datasets[datasetIndex].bars.push(new this.BoxClass({
 					value : value,
 					label : label,
+          datasetLabel: this.datasets[datasetIndex].label,
           x : this.scale.calculateX(xValue),
           y : this.scale.calculateY(datasetIndex+1),
           width : this.scale.calculateBoxWidth()+1,
