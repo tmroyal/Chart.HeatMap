@@ -64,7 +64,17 @@
     tooltipTemplate: "<%= xLabel %> | <%= yLabel %> : <%= value %>",
     
     // String - template for legend generation
-    legendTemplate : "<ul class=\"<%=name.toLowerCase()%>-legend\"><% for (var i=0; i<datasets.length; i++){%><li><span style=\"background-color:<%=datasets[i].strokeColor%>\"></span><%if(datasets[i].label){%><%=datasets[i].label%><%}%></li><%}%></ul>"
+    legendTemplate : '<div class="<%= name.toLowerCase() %>-legend">'+
+            '<span class="<%= name.toLowerCase() %>-legend-text">'+
+            '<%= min %>'+
+            '</span>'+
+            '<% for (var i = min; i <= max; i += (max-min)/6){ %>'+ // change 6 to number of divisions required
+            '<span class="<%= name.toLowerCase() %>-legend-box" style="background-color: <%= colorManager.getColor(i).color %>;">&nbsp; </span>'+
+            '<% } %>'+
+            '<span class="<%= name.toLowerCase() %>-legend-text">'+
+            '<%= max %>'+
+            '</span>'+
+            '</div>'
 
 	};
 
