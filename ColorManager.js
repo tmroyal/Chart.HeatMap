@@ -91,7 +91,7 @@ var ColorManager = function(){
         color: rgbString(clr.r, clr.g, clr.b, clr.a),
         highlight: rgbString(hclr.r, hclr.g, hclr.b, hclr.a)
       };
-    } 
+    };
   };
 
 };
