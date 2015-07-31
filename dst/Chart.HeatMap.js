@@ -283,7 +283,7 @@ var ColorManager = function(){
       scaleFactor = (colors.length-1)/(dataLength -1);
     } else {
       colorFunction = getIndexedColor;
-      scaleFactor = colors.length/datalLength;
+      scaleFactor = (colors.length)/(dataLength+1);
     } 
 
     this.colors = colors.map(function(clr){
