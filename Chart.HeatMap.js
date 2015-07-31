@@ -500,8 +500,8 @@
       if(Element){
         var tooltipPosition = Element.tooltipPosition();
         var tooltipVariables = {
-          xLabel: Element.datasetLabel,
-          yLabel: Element.label,
+          yLabel: Element.datasetLabel,
+          xLabel: Element.label,
           value: Element.value
         };
 
