@@ -135,20 +135,20 @@ var newChart = new Chart(ctx).HeatMap(data, options);</pre>
       Chart.HeatMap. 
       </p>
       <pre class="scrollable">
-// Boolean - exchange x and y axes in the chart
-rotate: false, 
-
 // String - background color for graph
 backgroundColor: '#fff',
 
 // Boolean - whether each square in the dataset is outlined
-stroke: true,
+stroke: false,
 
 // Number - width of the outline stroke.
-strokeWidth: 2,
+strokePerc: 0.05,
 
 // String - the outline stroke color.
-strokeColor: "rgb(255,255,255)",
+strokeColor: "rgb(128,128,128)",
+
+// String - the outline stroke color.
+highlightStrokeColor: "rgb(192,192,192)",
 
 // Boolean - whether to draw the heat map boxes with rounded corners
 rounded: true,
@@ -157,7 +157,7 @@ rounded: true,
 roundedRadius: 0.1,
 
 // Number - padding between heat map boxes (as a percentage of box size)
-boxPadding: 0.01,
+paddingScale: 0.05,
 
 // String - "gradient", "palette"
 colorInterpolation: "gradient",
@@ -175,10 +175,10 @@ colorHighlight: true,
 colorHighlightMultiplier: 0.92,
 
 // Boolean - Whether to draw label data
-labelData: false, 
+showLabels: true, 
 
 // Number - the font size of the label as percentage of box height
-labelSize: 0.9,
+labelScale: 0.2,
 
 // String - label font family
 labelFontFamily: '"HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif',
@@ -186,17 +186,25 @@ labelFontFamily: '"HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue
 // String - label font style
 labelFontStyle: "normal",
 
-// String - label font color.
-labelFontColor: "rgba(64,64,64,0.5)",
+// String - label font color
+labelFontColor: "rgba(0,0,0,0.5)",
 
-// String - template for tooltip
-tooltipTemplate: "<%= xLabel %>|<%= ylabel %>: <%= value %>",
+// String - tooltipTemplate
+tooltipTemplate: "<%= xLabel %> | <%= yLabel %> : <%= value %>",
 
 // String - template for legend generation
-legendTemplate : ""
-
+legendTemplate : '<div class="<%= name.toLowerCase() %>-legend">'+
+        '<span class="<%= name.toLowerCase() %>-legend-text">'+
+        '<%= min %>'+
+        '</span>'+
+        '<% for (var i = min; i <= max; i += (max-min)/6){ %>'+ // change 6 to number of divisions required
+        '<span class="<%= name.toLowerCase() %>-legend-box" style="background-color: <%= colorManager.getColor(i).color %>;">&nbsp; </span>'+
+        '<% } %>'+
+        '<span class="<%= name.toLowerCase() %>-legend-text">'+
+        '<%= max %>'+
+        '</span>'+
+        '</div>'
 </pre>
-TODO: fix legend template
 </div>
   </div>
 
