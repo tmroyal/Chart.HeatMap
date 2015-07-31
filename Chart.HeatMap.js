@@ -80,7 +80,6 @@
       this.min = Infinity; 
 
       this.colorManager = new ColorManager();
-      this.colorManager.setup(0, 10, this.options.colors, this.options.colorInterpolation, this.options.colorHighlightMultiplier);
 
 			this.ScaleClass = Chart.Scale.extend({
 				offsetGridLines : true,
@@ -367,7 +366,6 @@
       var datasetIndex = this.datasets.length;
 
       helpers.each(values,function(dataPoint,index){
-        var color = this.colorManager.getColor(dataPoint);
 
         datasetObject.bars.push(new this.BoxClass({
           value : dataPoint,
