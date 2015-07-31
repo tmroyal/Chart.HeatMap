@@ -2485,7 +2485,7 @@ var ColorManager = function(){
 			//Set up tooltip events on the chart
 			if (this.options.showTooltips){
 				helpers.bindEvents(this, this.options.tooltipEvents, function(evt){
-					var activeBox = this.getBoxAtEvent(evt);
+					var activeBox = (evt.type !== 'mouseout') ? this.getBoxAtEvent(evt) : undefined;
 
           this.activeElement = activeBox;
 
@@ -2497,8 +2497,8 @@ var ColorManager = function(){
             activeBox.fillColor = activeBox.highlightFill;
             activeBox.strokeColor = activeBox.highlightStroke;
 
-            this.showTooltip(activeBox);
           }
+          this.showTooltip(activeBox);
 				});
 			}
 
@@ -2822,29 +2822,31 @@ var ColorManager = function(){
     showTooltip : function(Element){
       this.draw();
 
-      var tooltipPosition = Element.tooltipPosition();
-      var tooltipVariables = {
-        xLabel: Element.datasetLabel,
-        yLabel: Element.label,
-        value: Element.value
-      };
+      if(Element){
+        var tooltipPosition = Element.tooltipPosition();
+        var tooltipVariables = {
+          xLabel: Element.datasetLabel,
+          yLabel: Element.label,
+          value: Element.value
+        };
 
-      new Chart.Tooltip({
-        x: Math.round(tooltipPosition.x),
-        y: Math.round(tooltipPosition.y+20),
-        xPadding: this.options.tooltipXPadding,
-        yPadding: this.options.tooltipYPadding,
-        fillColor: this.options.tooltipFillColor,
-        textColor: this.options.tooltipFontColor,
-        fontFamily: this.options.tooltipFontFamily,
-        fontStyle: this.options.tooltipFontStyle,
-        fontSize: this.options.tooltipFontSize,
-        caretHeight: this.options.tooltipCaretSize,
-        cornerRadius: this.options.tooltipCornerRadius,
-        text: helpers.template(this.options.tooltipTemplate, tooltipVariables),
-        chart: this.chart,
-        custom: this.options.customTooltips
-      }).draw();
+        new Chart.Tooltip({
+          x: Math.round(tooltipPosition.x),
+          y: Math.round(tooltipPosition.y+20),
+          xPadding: this.options.tooltipXPadding,
+          yPadding: this.options.tooltipYPadding,
+          fillColor: this.options.tooltipFillColor,
+          textColor: this.options.tooltipFontColor,
+          fontFamily: this.options.tooltipFontFamily,
+          fontStyle: this.options.tooltipFontStyle,
+          fontSize: this.options.tooltipFontSize,
+          caretHeight: this.options.tooltipCaretSize,
+          cornerRadius: this.options.tooltipCornerRadius,
+          text: helpers.template(this.options.tooltipTemplate, tooltipVariables),
+          chart: this.chart,
+          custom: this.options.customTooltips
+        }).draw();
+      }
 
       return this;
     },
