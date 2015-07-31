@@ -2756,6 +2756,8 @@ var ColorManager = function(){
         var clr = this.colorManager.getColor(box.value);
         box.fillColor = clr.color;
         box.highlightFill = clr.highlight;
+        box.strokeColor = this.options.strokeColor;
+        box.highlightStroke = this.options.highlightStrokeColor
         box.save();
       });
     },
