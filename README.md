@@ -1,2 +1,2 @@
 # Chart.HeatMap
-A heat map plugin for chart.js (coming soon)
+Documentation for Chart.HeatMap. Repo can be found [here](https://github.com/tmroyal/Chart.HeatMap/). 
