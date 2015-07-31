@@ -47,11 +47,11 @@ var ColorManager = function(){
     return val > 255 ? 255 : val;
   }
 
-  function getHighlightColor(color, options){
+  function getHighlightColor(color, colorHighlightMultiplier){
     return {
-      r: getScaledColor(color.r, options.colorHighlightMultiplier),
-      g: getScaledColor(color.g, options.colorHighlightMultiplier),
-      b: getScaledColor(color.b, options.colorHighlightMultiplier),
+      r: getScaledColor(color.r, colorHighlightMultiplier),
+      g: getScaledColor(color.g, colorHighlightMultiplier),
+      b: getScaledColor(color.b, colorHighlightMultiplier),
       a: color.a
     };
   }
@@ -60,29 +60,18 @@ var ColorManager = function(){
     return cssColorParser(color);
   }
  
-  function getDataRange(data){
-    var max = -Infinity, min = Infinity;
-    data.datasets.forEach(function(dataset){
-      var datasetMax = Math.max.apply(null, dataset.data);
-      var datasetMin = Math.min.apply(null, dataset.data);
-      if (datasetMax > max) { max = datasetMax; }
-      if (datasetMin < min) { min = datasetMin; }
-    });
-    return max-min;
-  };
-
-
   this.getColor = function(){
     console.error('ColorManager: colors have not been setup');
   };
 
   this.colors = [];
 
-  this.setup = function(data, colors, options){
+  this.setup = function(min, max, colors, colorInterpolation, colorHighlightMultiplier){
     var colorFunction, scaleFactor;
-    var dataLength = getDataRange(data);
+    var dataLength = max-min;
+    console.log(dataLength);
 
-    if (options.colorInterpolation === 'gradient'){
+    if (colorInterpolation === 'gradient'){
       colorFunction = getGradientColor;
       scaleFactor = (colors.length-1)/(dataLength -1);
     } else {
@@ -96,7 +85,7 @@ var ColorManager = function(){
     
     this.getColor = function(dataValue){
       var clr = colorFunction(this.colors, dataValue, scaleFactor);
-      var hclr = getHighlightColor(clr, options);
+      var hclr = getHighlightColor(clr, colorHighlightMultiplier);
 
       return { 
         color: rgbString(clr.r, clr.g, clr.b, clr.a),
@@ -106,7 +95,7 @@ var ColorManager = function(){
   };
 
 
-  function applyColors(colors, layers, options){
+  function applyColors(colors, layers, colorHighlightMultiplier){
     var results = [];
     var scaleFactor;
     var colorFunction;

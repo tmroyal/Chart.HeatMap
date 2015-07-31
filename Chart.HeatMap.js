@@ -62,12 +62,11 @@
 
     // String - tooltipTemplate
     tooltipTemplate: "<%= xLabel %> | <%= yLabel %> : <%= value %>",
-
+    
     // String - template for legend generation
-    legendTemplate : ""
+    legendTemplate : "<ul class=\"<%=name.toLowerCase()%>-legend\"><% for (var i=0; i<datasets.length; i++){%><li><span style=\"background-color:<%=datasets[i].strokeColor%>\"></span><%if(datasets[i].label){%><%=datasets[i].label%><%}%></li><%}%></ul>"
 
 	};
-
 
 	Chart.Type.extend({
 		name: "HeatMap",
@@ -76,9 +75,12 @@
 
 			//Expose options as a scope variable here so we can access it in the ScaleClass
 			var options = this.options;
-      
+
+      this.max = -Infinity; 
+      this.min = Infinity; 
+
       this.colorManager = new ColorManager();
-      this.colorManager.setup(data,this.options.colors,this.options);
+      this.colorManager.setup(0, 10, this.options.colors, this.options.colorInterpolation, this.options.colorHighlightMultiplier);
 
 			this.ScaleClass = Chart.Scale.extend({
 				offsetGridLines : true,
@@ -135,6 +137,7 @@
               ctx.textBaseline = (isRotated) ? "middle" : "top";
               ctx.fillText(label, 0, 0);
               ctx.restore();
+
             },this);
           }
         }
@@ -231,7 +234,6 @@
 					bars : []
 				};
 
-
         if (dataset.data.length > this.dataLength){
           this.dataLength = dataset.data.length;
         }
@@ -239,17 +241,14 @@
 				this.datasets.push(datasetObject);
         this.yLabels.push(dataset.label);
 
-
 				helpers.each(dataset.data,function(dataPoint,index){
-          var color = this.colorManager.getColor(dataPoint);
-					//Add a new point for each piece of data, passing any required data to draw.
 					datasetObject.bars.push(new this.BoxClass({
 						value : dataPoint,
 						label : this.xLabels[index],
 						datasetLabel: dataset.label,
 						strokeColor : this.options.strokeColor,
-						fillColor : color.color,
-						highlightFill : color.highlight, 
+						fillColor : 'white',
+						highlightFill : 'black',
 						highlightStroke : this.options.highlightStrokeColor,
 					}));
 				},this);
@@ -273,6 +272,9 @@
 				});
 				bar.save();
 			}, this);
+
+      this.findMaxAndMin();
+      this.applyColors();
 
 			this.render();
 		},
@@ -400,7 +402,31 @@
       this.scale.fit();
       this.update();
     },
-
+    applyColors : function(){
+      this.colorManager.setup(
+        this.min, 
+        this.max, 
+        this.options.colors, 
+        this.options.colorInterpolation, 
+        this.options.colorHighlightMultiplier
+      );
+      this.eachBars(function(bar){
+        var clr = this.colorManager.getColor(bar.value);
+        bar.fillColor = clr.color;
+        bar.highlightFill = clr.highlight;
+        bar.save();
+      });
+    },
+    findMaxAndMin : function(reset){
+      if (reset){
+        this.min = Infinity;
+        this.max = -Infinity; 
+      }
+      this.eachBars(function(bar,index,datasetIndex){
+        if (bar.value > this.max) { this.max = bar.value; }
+        if (bar.value < this.min) { this.min = bar.value; }
+      });
+    },
 		addData : function(valuesArray,label){
       valuesArray = valuesArray.concat().reverse(); // reverse to handle inverted scale
 
@@ -485,16 +511,14 @@
 			this.scale.draw(easingDecimal);
 
 			//Draw all the bars for each dataset
-			helpers.each(this.datasets,function(dataset,datasetIndex){
-				helpers.each(dataset.bars,function(bar,index){
+			this.eachBars(function(bar, index, datasetIndex){
           bar.transition({
             x : this.scale.calculateX(index),
             y : this.scale.calculateY(datasetIndex+1),
             width : this.scale.calculateBoxWidth()+1,
             height : this.scale.calculateBoxHeight()+1
           }, easingDecimal).draw();
-				},this);
-			},this);
+      });
 		}
 	});
 
