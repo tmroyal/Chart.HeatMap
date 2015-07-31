@@ -295,7 +295,7 @@
 			this.scale.update();
 			// Reset any highlight colours before updating.
 			if (this.activeElement){ 
-				activeElement.restore(['fillColor', 'strokeColor']);
+				this.activeElement.restore(['fillColor', 'strokeColor']);
 			}
 
 			this.eachBoxes(function(box){

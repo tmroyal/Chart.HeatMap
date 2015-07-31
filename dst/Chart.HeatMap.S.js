@@ -2485,7 +2485,7 @@ var ColorManager = function(){
 			//Set up tooltip events on the chart
 			if (this.options.showTooltips){
 				helpers.bindEvents(this, this.options.tooltipEvents, function(evt){
-					var activeBox = (evt.type !== 'mouseout') ? this.getBoxAtEvent(evt) : undefined;
+					var activeBox = this.getBoxAtEvent(evt);
 
           this.activeElement = activeBox;
 
@@ -2620,7 +2620,7 @@ var ColorManager = function(){
 			this.scale.update();
 			// Reset any highlight colours before updating.
 			if (this.activeElement){ 
-				activeElement.restore(['fillColor', 'strokeColor']);
+				this.activeElement.restore(['fillColor', 'strokeColor']);
 			}
 
 			this.eachBoxes(function(box){
