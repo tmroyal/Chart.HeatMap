@@ -273,7 +273,7 @@
 				bar.save();
 			}, this);
 
-      this.findMaxAndMin();
+      this.findMaxAndMin(true);
       this.applyColors();
 
 			this.render();
@@ -378,8 +378,6 @@
           height : this.scale.calculateBoxHeight()+1,
           datasetLabel: label,
           strokeColor : this.options.strokeColor,
-          fillColor : color.color,
-          highlightFill : color.highlight, 
           highlightStroke : this.options.highlightStrokeColor,
         }));
       },this);
@@ -390,6 +388,9 @@
       this.scale.steps += 1;
       this.scale.max += 1;
       this.scale.fit();
+
+      this.findMaxAndMin(true);
+      this.applyColors();
       this.update();
 
     },
@@ -400,6 +401,8 @@
       this.scale.steps -= 1; 
       this.scale.max -= 1; 
       this.scale.fit();
+      this.findMaxAndMin(true);
+      this.applyColors();
       this.update();
     },
     applyColors : function(){
@@ -434,7 +437,6 @@
 
 			helpers.each(valuesArray,function(value,datasetIndex){
 				//Add a new point for each piece of data, passing any required data to draw.
-        var color = this.colorManager.getColor(value);
 				this.datasets[datasetIndex].bars.push(new this.BoxClass({
 					value : value,
 					label : label,
@@ -444,12 +446,12 @@
           width : this.scale.calculateBoxWidth()+1,
           height : this.scale.calculateBoxHeight()+1,
           strokeColor : this.options.strokeColor,
-          fillColor : color.color,
-          highlightFill : color.highlight, 
           highlightStroke : this.options.highlightStrokeColor
 				}));
 			},this);
 
+      this.findMaxAndMin(true);
+      this.applyColor();
 			this.scale.addXLabel(label);
 			//Then re-render the chart.
 			this.update();
@@ -460,6 +462,8 @@
 			helpers.each(this.datasets,function(dataset){
 				dataset.bars.shift();
 			},this);
+      this.findMaxAndMin(true);
+      this.applyColors();
 			this.update();
 		},
 		reflow : function(){
