@@ -390,7 +390,15 @@
       this.scale.fit();
       this.update();
 
-      console.log(this.datasets);
+    },
+
+    removeDataset: function(){
+      this.datasets.pop();
+      this.scale.yLabels.pop();
+      this.scale.steps -= 1; 
+      this.scale.max -= 1; 
+      this.scale.fit();
+      this.update();
     },
 
 		addData : function(valuesArray,label){
