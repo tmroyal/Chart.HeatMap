@@ -22,26 +22,26 @@
 <div class="jumbotron">
   <div class="container">
       <h1>Chart.HeatMap</h1>
-      <h3>A Heat Map library and plug-in using Chart.js.</h3>
+      <h3>A Heat Map library and plug-in for Chart.js.</h3>
       <hr>
-      TODO: link to lib
-      <a class="btn btn-lg btn-primary" href="http://example.com/TODO/LINKTOLIB">Download</a>
+      <a class="btn btn-lg btn-primary" href="https://github.com/tmroyal/Chart.HeatMap/archive/v0.0.1-alpha.zip">Download</a>
     </div>
 </div>
 
 <div class="container">
   <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-8 col-md-offset-2">
       <h3>Introduction</h3>
       <p>This extension for Chart.js facilitates the creation of <a href="https://en.wikipedia.org/wiki/Heat_map">heat map charts.</a></p>
       <p>Note that library implements a the kind of heap map chart that displays data in a grid and not the more intricate
       heat map graphic typically used to track mouse or eye movements. See <a href="www.patrick-wied.at/static/heatmapjs/">heatmap.js</a>
       for this type of graphic.</p>
     </div>
-    <div class="col-md-6">
+  </div>
+  <div class="row">
+    <div class="col-md-8 col-md-offset-2">
       <h3>Sample</h3>
-      TODO: Make Sample
-      <canvas id="sampleChart" width="500" height="500"></canvas>
+      <canvas id="sampleChart"></canvas>
     </div>
   </div>
   <hr>
@@ -56,8 +56,7 @@
       <pre>npm install chart.heatmap.js</pre>
       <h5>Other</h5>
       <p>Chart.HeatMap may be downloaded here: 
-        TODO: Add link
-        <a href="">Download</a>
+        <a href="https://github.com/tmroyal/Chart.HeatMap/archive/v0.0.1-alpha.zip">Download</a>
       </p>
       <p>You may also view the repository directly at 
         <a href="https://github.com/tmroyal/Chart.HeatMap/">GitHub</a>
@@ -68,14 +67,14 @@
   <div class="row">
     <div class="col-md-8 col-md-offset-2">
       <h3>Usage</h3>
-      <p>Chart.HeatMap comes with both a standalone and plug-in version, with an <code>S</code> in the
+      <p>Chart.HeatMap has both a standalone and plug-in version, with an <code>S</code> in the
       filename of the standalone version to distinguish it. Be sure to use the version of Chart.HeatMap.js
       that is in the <code>dst/</code> directory of the original repo or bower package.</p>
       <h5>Javascript</h5>
       <pre class="scrollable">var ctx = document.getElementById('heatmap').getContext('2d');
 var newChart = new Chart(ctx).HeatMap(data, options);</pre>
       <h5>Example Standalone HTML</h5>
-      <pre clas="scrollable">&lt;script src="dst/Chart.HeatMap.S.js"&gt;&lt;/script&gt;
+      <pre class="scrollable">&lt;script src="dst/Chart.HeatMap.S.js"&gt;&lt;/script&gt;
 
 ...
       
@@ -138,7 +137,7 @@ var newChart = new Chart(ctx).HeatMap(data, options);</pre>
 // String - background color for graph
 backgroundColor: '#fff',
 
-// Boolean - whether each square in the dataset is outlined
+// Boolean - whether each box in the dataset is outlined
 stroke: false,
 
 // Number - width of the outline stroke.
@@ -147,7 +146,7 @@ strokePerc: 0.05,
 // String - the outline stroke color.
 strokeColor: "rgb(128,128,128)",
 
-// String - the outline stroke color.
+// String - the outline stroke highlight color.
 highlightStrokeColor: "rgb(192,192,192)",
 
 // Boolean - whether to draw the heat map boxes with rounded corners
@@ -174,7 +173,7 @@ colorHighlight: true,
 // 0.9 is slightly darker, and 1.1 is slightly lighter.
 colorHighlightMultiplier: 0.92,
 
-// Boolean - Whether to draw label data
+// Boolean - Whether to draw labels on the boxes
 showLabels: true, 
 
 // Number - the font size of the label as percentage of box height
@@ -190,20 +189,20 @@ labelFontStyle: "normal",
 labelFontColor: "rgba(0,0,0,0.5)",
 
 // String - tooltipTemplate
-tooltipTemplate: "<%= xLabel %> | <%= yLabel %> : <%= value %>",
+tooltipTemplate: "&lt;%= xLabel %&gt; | &lt;%= yLabel %&gt; : &lt;%= value %&gt;",
 
 // String - template for legend generation
-legendTemplate : '<div class="<%= name.toLowerCase() %>-legend">'+
-        '<span class="<%= name.toLowerCase() %>-legend-text">'+
-        '<%= min %>'+
-        '</span>'+
-        '<% for (var i = min; i <= max; i += (max-min)/6){ %>'+ // change 6 to number of divisions required
-        '<span class="<%= name.toLowerCase() %>-legend-box" style="background-color: <%= colorManager.getColor(i).color %>;">&nbsp; </span>'+
-        '<% } %>'+
-        '<span class="<%= name.toLowerCase() %>-legend-text">'+
-        '<%= max %>'+
-        '</span>'+
-        '</div>'
+legendTemplate : '&lt;div class="&lt;%= name.toLowerCase() %&gt;-legend"&gt;'+
+        '&lt;span class="&lt;%= name.toLowerCase() %&gt;-legend-text"&gt;'+
+        '&lt;%= min %&gt;'+
+        '&lt;/span&gt;'+
+        '&lt;% for (var i = min; i &lt;= max; i += (max-min)/6){ %&gt;'+ // change 6 to number of divisions required
+        '&lt;span class="&lt;%= name.toLowerCase() %&gt;-legend-box" style="background-color: &lt;%= colorManager.getColor(i).color %&gt;;"&gt;&nbsp; &lt;/span&gt;'+
+        '&lt;% } %&gt;'+
+        '&lt;span class="&lt;%= name.toLowerCase() %&gt;-legend-text"&gt;'+
+        '&lt;%= max %&gt;'+
+        '&lt;/span&gt;'+
+        '&lt;/div&gt;'
 </pre>
 </div>
   </div>
@@ -224,14 +223,23 @@ legendTemplate : '<div class="<%= name.toLowerCase() %>-legend">'+
   <div class="row">
     <div class="col-md-8 col-md-offset-2">
       <h3>Supported Methods</h3>
-      <p>The following methods from Chart.js are supported:
-      <ul>
-        <li><code>getPointsAtEvent(evt)</code></li>
-        <li><code>update()</code></li>
-        <li><code>addData(valuesArray, label)</code></li>
-        <li><code>removeData()</code></li>
-      </ul>
-      <p>See <a href="http://chartjs.org/docs/">Chart.js docs</a> for details on these functions.</p>
+      <p>The following methods are supported:
+      <h5>addData(valuesArray, label)</h5>
+      <p>Add one value to each dataset, with given label. This will increase the size of the x-axis by one.</p>
+      <h5>removeData()</h5>
+      <p>Remove the first data point, decreasing size of x-axis by one.</p>
+      <h5>addDataset(values, label)</h5>
+      <p>Add a new dataset, with given label. This will increase the size of the y-axis by one.</p>
+      <h5>removeDataset()</h5>
+      <p>Remove the first data point, decreasing size of y-axis by one.</p>
+      <h5>getBoxAtEvent(evt)</h5>
+      <p>Return the box/data point at the given mouse event. This is useful for dashboard style interaction.</p>
+      <pre clas="scrollable">canvas.onclick = function(evt){
+  var activeBox = chart.getBoxAtEvent(evt);
+  console.log(activeBox.value); // value at point
+  console.log(activeBox.label); // x-axis label
+  console.log(activeBox.datasetLabel); // y-axis label
+};</pre>
     </div>
   </div>
   <hr>
@@ -239,7 +247,7 @@ legendTemplate : '<div class="<%= name.toLowerCase() %>-legend">'+
   <div class="row">
     <div class="col-md-8 col-md-offset-2">
       <h3>Tooltip Options</h3>
-      <p>The data presented by tooltips can be altered using the <code>multiTooltipTemplate</code> property. 
+      <p>The data presented by tooltips can be altered using the <code>tooltipTemplate</code> property. 
       Templates have access to the following variables:
       <ul> 
         <li><code>xLabel</code>: the x label</li>
@@ -275,6 +283,9 @@ tooltipTemplate: "xLabel: <%= xLabel %> | yLabel: <%= yLabel %> | value: <%= val
       You may specify as many colors as you wish. You may also control the whether 
       an automatic gradient is generated using the parameter <code>colorInterpolation</code>.  
       </p>
+      <pre class="scrollable">...
+colors: ['red','green','blue'], // for this example
+...
     </div>
   </div>
 
@@ -305,7 +316,7 @@ tooltipTemplate: "xLabel: <%= xLabel %> | yLabel: <%= yLabel %> | value: <%= val
       <p>Chart.HeatMap has no baked in support for scrolling charts, although
       this effect can be approximated using <code>overflow-x: scroll</code> with a 
       chart wider than the enclosing <code>div</code>. In this case, chart options 
-      should be set to <code>responsive: false</code>, and both the size of the enclosing
+      should be set to <code>responsive: false</code>, and the size of both the enclosing
       div and the canvas element must be set explicitly.</p>
     </div>
   </div>
@@ -313,7 +324,7 @@ tooltipTemplate: "xLabel: <%= xLabel %> | yLabel: <%= yLabel %> | value: <%= val
   <div class="row">
     <div class="col-md-8 col-md-offset-2">
       <div style="height: 300px; width: 100%; overflow-x: scroll;">
-        <canvas id="scrollChart" height="300" width="2000"></canvas>
+        <canvas id="scrollChart" height="500" width="1000"></canvas>
       </div>
     </div>
   </div>
@@ -377,94 +388,28 @@ tooltipTemplate: "xLabel: <%= xLabel %> | yLabel: <%= yLabel %> | value: <%= val
 
   var sampleChart = new Chart(ctx('sampleChart')).HeatMap(sampleData, {responsive: true});
 
-  var tooltipChartData = clone(sampleData);
-  tooltipChartData.datasets[0].tooltipData = "Cob";
-  tooltipChartData.datasets[1].tooltipData = "Beer";
-  tooltipChartData.datasets[2].tooltipData = "Wine";
-  tooltipChartData.datasets[3].tooltipData = "Bread";
-  tooltipChartData.datasets[4].tooltipData = "Meal";
-
+  var colorTestColors = ['red','green','blue'];
 
   var tooltipOptionsChart = new Chart(ctx('tooltipOptionsChart'))
-    .HeatMap(tooltipChartData, {
+    .HeatMap(sampleData, {
         responsive: true,
-        multiTooltipTemplate: "maxHeight: <%= maxHeight %> | sum: <%= sum %> | xLabel: <%= xLabel %>"+
-        " | value: <%= value %> | x: <%= x %> | tooltipData: <%= tooltipData %>"
+        tooltipTemplate: "xLabel: <%= xLabel %> | yLabel: <%= yLabel %> | value: <%= value %>"
       });
-
-  var verticalPositionChart = new Chart(ctx('verticalPositionChart'))
-    .HeatMap(sampleData, {
-      responsive: true, 
-      colors: ['red', 'orange', 'yellow', 'green', 'rgb(128,128,255)'],
-      colorAssignmentMethod: 'verticalPosition',
-      labelFontColor: 'black',
-      stroke: false
-    });
-
-  var sumChart = new Chart(ctx('sumChart'))
-    .HeatMap(sampleData, {
-      responsive: true, 
-      colors: ['red', 'orange', 'yellow', 'green', 'rgb(128,128,255)'],
-      colorAssignmentMethod: 'sum',
-      labelFontColor: 'black',
-      stroke: false
-    });
-
-
-  var maxHeightChart = new Chart(ctx('maxHeightChart'))
-    .HeatMap(sampleData, {
-      responsive: true, 
-      colors: ['red', 'orange', 'yellow', 'green', 'rgb(128,128,255)'],
-      colorAssignmentMethod: 'maxHeight',
-      labelFontColor: 'black',
-      stroke: false
-    });
 
   var gradientChart = new Chart(ctx('gradientChart'))
     .HeatMap(sampleData, {
       responsive: true, 
-      colors: ['rgb(128,128,255)', 'rgb(64,255,255)'],
+      colors: colorTestColors,
       colorInterpolation: 'gradient',
+      showLabels: false
     });
 
   var paletteChart = new Chart(ctx('paletteChart'))
     .HeatMap(sampleData, {
       responsive: true, 
-      colors: ['rgb(128,128,255)', 'rgb(64,255,255)'],
+      colors: colorTestColors,
       colorInterpolation: 'palette',
-    });
-
-  var cycleChart = new Chart(ctx('cycleChart'))
-    .HeatMap(sampleData, {
-      responsive: true, 
-      colors: ['rgb(128,128,255)', 'rgb(64,255,255)'],
-      colorInterpolation: 'cycle',
-    });
-
-  var idealChart = new Chart(ctx('idealChart'))
-    .HeatMap(sampleData, {
-      responsive: true, 
-      labelPlacementMethod: 'ideal',
-      labelMinimumSize: 8
-    });
-
-  var maxHeightChart = new Chart(ctx('placementMaxHeightChart'))
-    .HeatMap(sampleData, {
-      responsive: true, 
-      labelPlacementMethod: 'maxHeight'
-    });
-
-
-  var idealMaxHeightChart = new Chart(ctx('idealMaxHeightChart'))
-    .HeatMap(sampleData, {
-      responsive: true, 
-      labelPlacementMethod: 'idealThenMaxHeight'
-    });
-
-  var labelMinimumSizeChart = new Chart(ctx('labelMinimumSizeChart'))
-    .HeatMap(sampleData, {
-      responsive: true, 
-      labelMinimumSize: 35
+      showLabels: false
     });
 
   var scrollChart = new Chart(ctx('scrollChart')).HeatMap(sampleData, {responsive: false});
