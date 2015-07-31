@@ -2485,18 +2485,20 @@ var ColorManager = function(){
 			//Set up tooltip events on the chart
 			if (this.options.showTooltips){
 				helpers.bindEvents(this, this.options.tooltipEvents, function(evt){
-					var activeBoxes = (evt.type !== 'mouseout') ? this.getBoxesAtEvent(evt) : [];
+					var activeBox = (evt.type !== 'mouseout') ? this.getBoxAtEvent(evt) : undefined;
+
+          this.activeElement = activeBox;
 
 					this.eachBoxes(function(box){
 						box.restore(['fillColor', 'strokeColor']);
 					});
 
-					helpers.each(activeBoxes, function(activeBox){
-						activeBox.fillColor = activeBox.highlightFill;
-						activeBox.strokeColor = activeBox.highlightStroke;
-					});
+          if (activeBox){
+            activeBox.fillColor = activeBox.highlightFill;
+            activeBox.strokeColor = activeBox.highlightStroke;
 
-					this.showTooltip(activeBoxes);
+            this.showTooltip(activeBox);
+          }
 				});
 			}
 
@@ -2617,9 +2619,9 @@ var ColorManager = function(){
 		update : function(){
 			this.scale.update();
 			// Reset any highlight colours before updating.
-			helpers.each(this.activeElements, function(activeElement){
+			if (this.activeElement){ 
 				activeElement.restore(['fillColor', 'strokeColor']);
-			});
+			}
 
 			this.eachBoxes(function(box){
 				box.save();
@@ -2632,19 +2634,19 @@ var ColorManager = function(){
 				helpers.each(dataset.boxes, callback, this, datasetIndex);
 			},this);
 		},
-		getBoxesAtEvent : function(e){
+		getBoxAtEvent : function(e){
       var eventPosition = helpers.getRelativePosition(e),
         boxIndex;
 
 			for (var datasetIndex = 0; datasetIndex < this.datasets.length; datasetIndex++) {
 				for (boxIndex = 0; boxIndex < this.datasets[datasetIndex].boxes.length; boxIndex++) {
 					if (this.datasets[datasetIndex].boxes[boxIndex].inRange(eventPosition.x,eventPosition.y)){
-						return [this.datasets[datasetIndex].boxes[boxIndex]];
+						return this.datasets[datasetIndex].boxes[boxIndex];
 					}
 				}
 			}
 
-			return [];
+			return undefined;
 		},
 		buildScale : function(labels, yLabels){
 			var self = this;
@@ -2817,33 +2819,33 @@ var ColorManager = function(){
 			});
 			this.scale.update(newScaleProps);
 		},
-    showTooltip : function(ChartElements){
+    showTooltip : function(Element){
       this.draw();
-      helpers.each(ChartElements, function(Element) {
-        var tooltipPosition = Element.tooltipPosition();
-        var tooltipVariables = {
-          xLabel: Element.datasetLabel,
-          yLabel: Element.label,
-          value: Element.value
-        };
 
-        new Chart.Tooltip({
-          x: Math.round(tooltipPosition.x),
-          y: Math.round(tooltipPosition.y+20),
-          xPadding: this.options.tooltipXPadding,
-          yPadding: this.options.tooltipYPadding,
-          fillColor: this.options.tooltipFillColor,
-          textColor: this.options.tooltipFontColor,
-          fontFamily: this.options.tooltipFontFamily,
-          fontStyle: this.options.tooltipFontStyle,
-          fontSize: this.options.tooltipFontSize,
-          caretHeight: this.options.tooltipCaretSize,
-          cornerRadius: this.options.tooltipCornerRadius,
-          text: helpers.template(this.options.tooltipTemplate, tooltipVariables),
-          chart: this.chart,
-          custom: this.options.customTooltips
-        }).draw();
-      }, this);
+      var tooltipPosition = Element.tooltipPosition();
+      var tooltipVariables = {
+        xLabel: Element.datasetLabel,
+        yLabel: Element.label,
+        value: Element.value
+      };
+
+      new Chart.Tooltip({
+        x: Math.round(tooltipPosition.x),
+        y: Math.round(tooltipPosition.y+20),
+        xPadding: this.options.tooltipXPadding,
+        yPadding: this.options.tooltipYPadding,
+        fillColor: this.options.tooltipFillColor,
+        textColor: this.options.tooltipFontColor,
+        fontFamily: this.options.tooltipFontFamily,
+        fontStyle: this.options.tooltipFontStyle,
+        fontSize: this.options.tooltipFontSize,
+        caretHeight: this.options.tooltipCaretSize,
+        cornerRadius: this.options.tooltipCornerRadius,
+        text: helpers.template(this.options.tooltipTemplate, tooltipVariables),
+        chart: this.chart,
+        custom: this.options.customTooltips
+      }).draw();
+
       return this;
     },
 		draw : function(ease){
