@@ -403,7 +403,9 @@
       this.applyColors();
       this.update();
     },
+
     applyColors : function(){
+
       this.colorManager.setup(
         this.min, 
         this.max, 
@@ -411,6 +413,7 @@
         this.options.colorInterpolation, 
         this.options.colorHighlightMultiplier
       );
+
       this.eachBars(function(bar){
         var clr = this.colorManager.getColor(bar.value);
         bar.fillColor = clr.color;
@@ -418,6 +421,7 @@
         bar.save();
       });
     },
+
     findMaxAndMin : function(reset){
       if (reset){
         this.min = Infinity;
@@ -428,6 +432,7 @@
         if (bar.value < this.min) { this.min = bar.value; }
       });
     },
+
 		addData : function(valuesArray,label){
       valuesArray = valuesArray.concat().reverse(); // reverse to handle inverted scale
 

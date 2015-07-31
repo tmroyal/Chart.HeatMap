@@ -17,8 +17,8 @@ var ColorManager = function(){
     return v2*x+v1*(1-x);
   }
 
-  function getGradientColor(colors, i, scaleFactor){
-    var fIndex = i*scaleFactor;
+  function getGradientColor(colors, i, base, scaleFactor){
+    var fIndex = (i-base)*scaleFactor;
     var iIndex = Math.floor(fIndex);
     var iv = fIndex - iIndex;
     var iIndex1 = iIndex+1;
@@ -32,8 +32,8 @@ var ColorManager = function(){
     };
   }
 
-  function getIndexedColor(colors, i, scaleFactor){
-    var index = Math.floor(i*scaleFactor);
+  function getIndexedColor(colors, i, base, scaleFactor){
+    var index = Math.floor((i-base)*scaleFactor);
     return {
       r: colors[index][0],
       g: colors[index][1],
@@ -69,7 +69,7 @@ var ColorManager = function(){
   this.setup = function(min, max, colors, colorInterpolation, colorHighlightMultiplier){
     var colorFunction, scaleFactor;
     var dataLength = max-min;
-    console.log(dataLength);
+    var base = min;
 
     if (colorInterpolation === 'gradient'){
       colorFunction = getGradientColor;
@@ -84,7 +84,7 @@ var ColorManager = function(){
     });
     
     this.getColor = function(dataValue){
-      var clr = colorFunction(this.colors, dataValue, scaleFactor);
+      var clr = colorFunction(this.colors, dataValue, base, scaleFactor);
       var hclr = getHighlightColor(clr, colorHighlightMultiplier);
 
       return { 
