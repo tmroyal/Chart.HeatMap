@@ -224,23 +224,58 @@ var ColorManager = function(){
     return v2*x+v1*(1-x);
   }
 
-  function getGradientColor(colors, i, base, scaleFactor){
-    var fIndex = (i-base)*scaleFactor;
+  function getGradientColor(colors, negativeColors, i, base, scaleFactor, scaleFactorNegative){
+    var useColors = colors;
+    var useScaleFactor = scaleFactor;
+
+    if (negativeColors) {
+      if (i < 0) {
+        i = Math.abs(i);
+        useColors = negativeColors;
+
+        if (scaleFactorNegative === false) {
+          base = Math.abs(base);
+          useScaleFactor = Math.abs(scaleFactor);
+        } else {
+          useScaleFactor = Math.abs(scaleFactorNegative);
+        }
+      }
+    }
+
+    var fIndex = (i-base)*useScaleFactor;
     var iIndex = Math.floor(fIndex);
+    if (iIndex > useColors.length - 1){ iIndex = useColors.length - 1; }
+    if (iIndex < 0) { iIndex = 0 };
+
     var iv = fIndex - iIndex;
     var iIndex1 = iIndex+1;
-    if (iIndex1 > colors.length - 1){ iIndex1 = iIndex; }
+    if (iIndex1 > useColors.length - 1){ iIndex1 = iIndex; }
 
     return {
-      r:  interp(colors[iIndex][0], colors[iIndex1][0], iv),
-      g:  interp(colors[iIndex][1], colors[iIndex1][1], iv),
-      b:  interp(colors[iIndex][2], colors[iIndex1][2], iv),
-      a:  interp(colors[iIndex][3], colors[iIndex1][3], iv)
+      r:  interp(useColors[iIndex][0], useColors[iIndex1][0], iv),
+      g:  interp(useColors[iIndex][1], useColors[iIndex1][1], iv),
+      b:  interp(useColors[iIndex][2], useColors[iIndex1][2], iv),
+      a:  interp(useColors[iIndex][3], useColors[iIndex1][3], iv)
     };
   }
 
-  function getIndexedColor(colors, i, base, scaleFactor){
+  function getIndexedColor(colors, negativeColors, i, base, scaleFactor, scaleFactorNegative){
     var index = Math.floor((i-base)*scaleFactor);
+
+    if (negativeColors && index < 0) {
+      index = (index * -1) - 1;
+      if (index >= negativeColors.length) {
+        index = negativeColors.length - 1;
+      }
+
+      return {
+        r: negativeColors[index][0],
+        g: negativeColors[index][1],
+        b: negativeColors[index][2],
+        a: negativeColors[index][3],
+      };
+    }
+
     return {
       r: colors[index][0],
       g: colors[index][1],
@@ -266,35 +301,63 @@ var ColorManager = function(){
   function cssColorToArray(color){
     return cssColorParser(color);
   }
- 
+
   this.getColor = function(){
     console.error('ColorManager: colors have not been setup');
   };
 
   this.colors = [];
+  this.negativeColors = [];
 
-  this.setup = function(min, max, colors, colorInterpolation, colorHighlightMultiplier){
+  this.setup = function (min, max, colors, negativeColors, colorInterpolation, colorHighlightMultiplier) {
     var colorFunction, scaleFactor;
-    var dataLength = max-min;
     var base = min;
+    var dataLength = max - min;
 
-    if (colorInterpolation === 'gradient'){
+    var scaleFactorNegative = false;
+    var dataLengthNegative = false;
+
+    if (negativeColors) {
+      if (max < 0) {
+        max = max + 0.000001;
+        base = max;
+      } else if (max > 0 && min < 0) {
+        dataLength = max;
+        dataLengthNegative = min;
+        base = 0;
+      }
+    }
+
+    if (colorInterpolation === 'gradient') {
       colorFunction = getGradientColor;
-      scaleFactor = (colors.length-1)/(dataLength -1);
+      scaleFactor = (colors.length ) / (dataLength !== 0 ? dataLength : 1);
     } else {
       colorFunction = getIndexedColor;
-      scaleFactor = (colors.length)/(dataLength+1);
-    } 
+      scaleFactor = (colors.length) / (dataLength + 1);
+    }
 
-    this.colors = colors.map(function(clr){
+    if (negativeColors) {
+      if (max > 0 && min < 0) {
+        if (colorInterpolation === 'gradient') {
+          scaleFactorNegative = (negativeColors.length - 1) / (dataLengthNegative - 1);
+        } else {
+          scaleFactorNegative = (negativeColors.length) / (dataLengthNegative + 1);
+        }
+      }
+    }
+
+    this.colors = colors.map(function (clr) {
       return cssColorToArray(clr);
     });
-    
-    this.getColor = function(dataValue){
-      var clr = colorFunction(this.colors, dataValue, base, scaleFactor);
+    this.negativeColors = negativeColors.map(function (clr) {
+      return cssColorToArray(clr);
+    });
+
+    this.getColor = function (dataValue) {
+      var clr = colorFunction(this.colors, this.negativeColors, dataValue, base, scaleFactor, scaleFactorNegative);
       var hclr = getHighlightColor(clr, colorHighlightMultiplier);
 
-      return { 
+      return {
         color: rgbString(clr.r, clr.g, clr.b, clr.a),
         highlight: rgbString(hclr.r, hclr.g, hclr.b, hclr.a)
       };
@@ -715,8 +778,8 @@ var ColorManager = function(){
     removeDataset: function(){
       this.datasets.pop();
       this.scale.yLabels.pop();
-      this.scale.steps -= 1; 
-      this.scale.max -= 1; 
+      this.scale.steps -= 1;
+      this.scale.max -= 1;
       this.scale.fit();
       this.findMaxAndMin(true);
       this.applyColors();
@@ -726,10 +789,11 @@ var ColorManager = function(){
     applyColors : function(){
 
       this.colorManager.setup(
-        this.min, 
-        this.max, 
-        this.options.colors, 
-        this.options.colorInterpolation, 
+        this.min,
+        this.max,
+        this.options.colors,
+        this.options.negativeColors,
+        this.options.colorInterpolation,
         this.options.colorHighlightMultiplier
       );
 
