@@ -6,7 +6,7 @@
   "devDependencies": {
     "chart.js": "^1.0.2",
     "jshint": "latest",
-    "uglify-js": "^1.3.5"
+    "uglify-js": "^3.6.1"
   },
   "scripts": {
     "test": "echo \"No tests specified \n\" && exit 0",
