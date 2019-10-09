@@ -9,6 +9,7 @@ Thank you to all who attempted to contribute to this project, and sorry for not 
 ## Better Alternatives
 
 https://github.com/kurkle/chartjs-chart-treemap
+
 https://github.com/kurkle/chartjs-chart-matrix
 
 See also:
