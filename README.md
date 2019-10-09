@@ -1,5 +1,18 @@
-# Chart.HeatMap.js
-HeatMap library and plug-in for Chart.js.
+# Chart.HeatMap.js (No longer being maintained!)
+
+HeatMap library and plug-in for Chart.js. **This library is no longer being maintained**. 
+
+Thank you to anyone who has expressed interest in this project. It was an early attempt by myself to create a javascript library, but life happened (as it has a tendency to do) immediately after I released this. I have since been far away from the javascript ecosystem (and programming in general), and therefore I no longer (10/9/2019) even have the qualifications to evaluate pull requests. Perhaps one day...
+
+Thank you to all who attempted to contribute to this project, and sorry for not being able to integrate your pull requests.
+
+## Better Alternatives
+
+https://github.com/kurkle/chartjs-chart-treemap
+https://github.com/kurkle/chartjs-chart-matrix
+
+See also:
+https://github.com/chartjs/Chart.js/issues/4627
 
 ## Documentation
 
