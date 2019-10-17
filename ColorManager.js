@@ -73,7 +73,7 @@ var ColorManager = function(){
 
     if (colorInterpolation === 'gradient'){
       colorFunction = getGradientColor;
-      scaleFactor = (colors.length-1)/(dataLength -1);
+      scaleFactor = (colors.length-1)/(dataLength +1);
     } else {
       colorFunction = getIndexedColor;
       scaleFactor = (colors.length)/(dataLength+1);
