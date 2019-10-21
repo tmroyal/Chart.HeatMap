@@ -29,6 +29,10 @@ Documentation is available [here](http://tmroyal.github.io/Chart.HeatMap/).
 
 `npm install chart.heatmap.js`
 
+To install from Mischa Braam's fork use command below. If that doesn't work please advise [stack overflow](https://stackoverflow.com/questions/17509669/how-to-install-an-npm-package-from-github-directly) for a solution.
+
+`npm install mischabraam/Chart.Heatmap#master`
+
 ### Github
 
 The built distributions are also available in the dst folder in 

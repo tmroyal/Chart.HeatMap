@@ -411,8 +411,8 @@
     removeDataset: function(){
       this.datasets.pop();
       this.scale.yLabels.pop();
-      this.scale.steps -= 1; 
-      this.scale.max -= 1; 
+      this.scale.steps -= 1;
+      this.scale.max -= 1;
       this.scale.fit();
       this.findMaxAndMin(true);
       this.applyColors();
@@ -422,10 +422,11 @@
     applyColors : function(){
 
       this.colorManager.setup(
-        this.min, 
-        this.max, 
-        this.options.colors, 
-        this.options.colorInterpolation, 
+        this.min,
+        this.max,
+        this.options.colors,
+        this.options.negativeColors,
+        this.options.colorInterpolation,
         this.options.colorHighlightMultiplier
       );
 
