@@ -2047,7 +2047,7 @@
 var cssColorParser = function(){
 
   var kCSSColorTable = {
-    "rebeccapurple": [102, 51, 153], 
+    "rebeccapurple": [102, 51, 153],
     "transparent": [0,0,0,0], "aliceblue": [240,248,255,1],
     "antiquewhite": [250,235,215,1], "aqua": [0,255,255,1],
     "aquamarine": [127,255,212,1], "azure": [240,255,255,1],
@@ -2250,8 +2250,8 @@ var ColorManager = function(){
     var iIndex = Math.floor(fIndex);
     var iv = fIndex - iIndex;
     var iIndex1 = iIndex+1;
-    if (iIndex1 > colors.length - 1){ iIndex1 = iIndex; }
-
+    if (iIndex1 > colors.length - 1){ iIndex1 = colors.length - 1; }
+    if (iIndex  > colors.length - 1){ iIndex = colors.length - 1; }
     return {
       r:  interp(colors[iIndex][0], colors[iIndex1][0], iv),
       g:  interp(colors[iIndex][1], colors[iIndex1][1], iv),
@@ -2287,7 +2287,7 @@ var ColorManager = function(){
   function cssColorToArray(color){
     return cssColorParser(color);
   }
- 
+
   this.getColor = function(){
     console.error('ColorManager: colors have not been setup');
   };
@@ -2305,17 +2305,17 @@ var ColorManager = function(){
     } else {
       colorFunction = getIndexedColor;
       scaleFactor = (colors.length)/(dataLength+1);
-    } 
+    }
 
     this.colors = colors.map(function(clr){
       return cssColorToArray(clr);
     });
-    
+
     this.getColor = function(dataValue){
       var clr = colorFunction(this.colors, dataValue, base, scaleFactor);
       var hclr = getHighlightColor(clr, colorHighlightMultiplier);
 
-      return { 
+      return {
         color: rgbString(clr.r, clr.g, clr.b, clr.a),
         highlight: rgbString(hclr.r, hclr.g, hclr.b, hclr.a)
       };
@@ -2363,15 +2363,15 @@ var ColorManager = function(){
     colors: [ "rgba(220,220,220,0.9)", "rgba(151,187,205,0.9)"],
 
     // Boolean - whether boxes change color on hover.
-    colorHighlight: true, 
+    colorHighlight: true,
 
     // Number - a floating point value which specifies how much lighter or
-    // darker a color becomes when hovered, where 1 is no change, 
+    // darker a color becomes when hovered, where 1 is no change,
     // 0.9 is slightly darker, and 1.1 is slightly lighter.
     colorHighlightMultiplier: 0.92,
 
     // Boolean - Whether to draw label data
-    showLabels: true, 
+    showLabels: true,
 
     // Number - the font size of the label as percentage of box height
     labelScale: 0.2,
@@ -2387,7 +2387,7 @@ var ColorManager = function(){
 
     // String - tooltipTemplate
     tooltipTemplate: "<%= xLabel %> | <%= yLabel %> : <%= value %>",
-    
+
     // String - template for legend generation
     legendTemplate : '<div class="<%= name.toLowerCase() %>-legend">'+
             '<span class="<%= name.toLowerCase() %>-legend-text">'+
@@ -2411,8 +2411,8 @@ var ColorManager = function(){
 			//Expose options as a scope variable here so we can access it in the ScaleClass
 			var options = this.options;
 
-      this.max = -Infinity; 
-      this.min = Infinity; 
+      this.max = -Infinity;
+      this.min = Infinity;
 
       this.colorManager = new ColorManager();
 
@@ -2532,8 +2532,8 @@ var ColorManager = function(){
           top += topPadding*0.5;
           drawWidth -= leftPadding;
           drawHeight -= topPadding;
-          
-          
+
+
           // Canvas doesn't allow us to stroke inside the width so we can
           // adjust the sizes to fit if we're setting a stroke on the line
           if (this.showStroke){
@@ -2619,7 +2619,7 @@ var ColorManager = function(){
 		update : function(){
 			this.scale.update();
 			// Reset any highlight colours before updating.
-			if (this.activeElement){ 
+			if (this.activeElement){
 				this.activeElement.restore(['fillColor', 'strokeColor']);
 			}
 
@@ -2674,8 +2674,8 @@ var ColorManager = function(){
 				calculateYRange: function(currentHeight){
           var updatedRanges = {
             min: 0,
-            max: self.datasets.length, 
-            steps: self.datasets.length, 
+            max: self.datasets.length,
+            steps: self.datasets.length,
             stepValue: 1
           };
 
@@ -2736,8 +2736,8 @@ var ColorManager = function(){
     removeDataset: function(){
       this.datasets.pop();
       this.scale.yLabels.pop();
-      this.scale.steps -= 1; 
-      this.scale.max -= 1; 
+      this.scale.steps -= 1;
+      this.scale.max -= 1;
       this.scale.fit();
       this.findMaxAndMin(true);
       this.applyColors();
@@ -2747,10 +2747,10 @@ var ColorManager = function(){
     applyColors : function(){
 
       this.colorManager.setup(
-        this.min, 
-        this.max, 
-        this.options.colors, 
-        this.options.colorInterpolation, 
+        this.min,
+        this.max,
+        this.options.colors,
+        this.options.colorInterpolation,
         this.options.colorHighlightMultiplier
       );
 
@@ -2767,7 +2767,7 @@ var ColorManager = function(){
     findMaxAndMin : function(reset){
       if (reset){
         this.min = Infinity;
-        this.max = -Infinity; 
+        this.max = -Infinity;
       }
       this.eachBoxes(function(box,index,datasetIndex){
         if (box.value > this.max) { this.max = box.value; }
